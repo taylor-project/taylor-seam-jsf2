@@ -1,4 +1,4 @@
-package org.jboss.seam.debug.jsf;
+package org.jboss.seam.debug.jsf2;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -11,16 +11,17 @@ import javax.faces.context.ResponseWriter;
 import javax.faces.event.PhaseEvent;
 import javax.faces.event.PhaseId;
 import javax.faces.event.PhaseListener;
+import javax.faces.view.facelets.ResourceResolver;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.contexts.FacesLifecycle;
 import org.jboss.seam.navigation.Pages;
 
-import com.sun.facelets.Facelet;
 import com.sun.facelets.StateWriterControl;
-import com.sun.facelets.compiler.SAXCompiler;
-import com.sun.facelets.impl.DefaultFaceletFactory;
-import com.sun.facelets.impl.DefaultResourceResolver;
+import com.sun.faces.facelets.Facelet;
+import com.sun.faces.facelets.compiler.SAXCompiler;
+import com.sun.faces.facelets.impl.DefaultFaceletFactory;
+import com.sun.faces.facelets.impl.DefaultResourceResolver;
 
 /**
  * Intercepts any request for a view-id like /debug.xxx and renders
@@ -42,7 +43,16 @@ public class SeamDebugPhaseListener implements PhaseListener
          {
             FacesContext facesContext = FacesContext.getCurrentInstance();
             URL url = SeamDebugPhaseListener.class.getClassLoader().getResource("META-INF/debug.xhtml");
-            Facelet f = new DefaultFaceletFactory( new SAXCompiler(), new DefaultResourceResolver() ).getFacelet(url);
+            
+            ResourceResolver resroler=new ResourceResolver(){
+               @Override
+               public URL resolveUrl(String path)
+               {
+                  return SeamDebugPhaseListener.class.getClassLoader().getResource(path);
+               }
+            };
+               
+            Facelet f = new DefaultFaceletFactory( new SAXCompiler(),resroler).getFacelet(url);
             UIViewRoot viewRoot = facesContext.getViewRoot();
             f.apply(facesContext, viewRoot);
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
