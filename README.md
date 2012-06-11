@@ -14,3 +14,7 @@ We will make every effort to submit any patches that we create here back to the 
 We will also make every effort to stay up to date with all appropriate changes on the Seam trunk.
 
 This project only forks the minimum amount of code necessary to support the Taylor project.
+
+================
+
+Maven Repo: http://taylor.sourceforge.net/maven2/
