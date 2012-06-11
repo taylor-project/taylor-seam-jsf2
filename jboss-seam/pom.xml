@@ -1,17 +1,18 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
 		<groupId>org.jboss.seam</groupId>
 		<artifactId>jboss-seam-parent</artifactId>
-		<version>2.3.0.ALPHA</version>
+		<version>T.2.3.0-SNAPSHOT</version>
 		<relativePath>../jboss-seam-parent/pom.xml</relativePath>
 	</parent>
-	<groupId>org.jboss.seam</groupId>
-	<artifactId>jboss-seam</artifactId>
+
+	<artifactId>jboss-seam-jsf2</artifactId>
 	<packaging>ejb</packaging>
-	<name>Seam Core</name>
-	<description>Seam core module for Seam framework</description>
+	<name>Seam Core JSF2</name>
+	<description>Seam core module for Seam framework integrated with JSF2</description>
 
 	<build>
 		<plugins>
@@ -33,63 +34,66 @@
 				</executions>
 			</plugin>
 
-             <plugin>
-                 <artifactId>maven-javadoc-plugin</artifactId>
-                 <version>2.7</version>
-                 <configuration>
-                     <links>
-                         <link>http://java.sun.com/j2se/5.0/docs/api</link>
-                     </links>
-                     <keywords>true</keywords>
-                     <author>true</author>
-                     <stylesheetfile>jdstyle.css</stylesheetfile>
-                     <doctitle>JBoss Seam ${project.name} API ${project.version}</doctitle> <!-- Used by javadoc:javadoc goal -->
-                     <detectOfflineLinks>false</detectOfflineLinks>
-                 </configuration>
-                 <executions>
-                      <execution>
-                          <id>attach-javadocs</id>
-                          <phase>package</phase>
-                          <goals>
-                              <goal>jar</goal>
-                          </goals>
-                      </execution>
-                  </executions>
-             </plugin>
-             <plugin>
-                 <artifactId>maven-antrun-plugin</artifactId>
-                 <version>1.6</version>
-                  <configuration>
-                     <target>
-	                     <jar destfile="${project.build.directory}/jboss-seam-wls-compatible.jar">
-						    <zipfileset includes="**/*" excludes="org/jboss/seam/async/TimerServiceDispatcher*" src="${project.build.directory}/jboss-seam.jar" />
-						    <manifest>
+			<plugin>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.7</version>
+				<configuration>
+					<links>
+						<link>http://java.sun.com/j2se/5.0/docs/api</link>
+					</links>
+					<keywords>true</keywords>
+					<author>true</author>
+					<stylesheetfile>jdstyle.css</stylesheetfile>
+					<doctitle>JBoss Seam ${project.name} API ${project.version}</doctitle> <!-- Used by javadoc:javadoc goal -->
+					<detectOfflineLinks>false</detectOfflineLinks>
+				</configuration>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.6</version>
+				<configuration>
+					<target>
+						<jar destfile="${project.build.directory}/${project.artifactId}-wls-compatible.jar">
+							<zipfileset includes="**/*"
+								excludes="org/jboss/seam/async/TimerServiceDispatcher*" src="${project.build.directory}/${project.artifactId}.jar" />
+							<manifest>
 								<attribute name="Built-By" value="${user.name}" />
 								<attribute name="Implementation-Vendor" value="${project.organization.name}" />
-								<attribute name="Implementation-Title" value="JBoss Seam Weblogic compatible" />
+								<attribute name="Implementation-Title" value="JBoss Seam JSF2 Weblogic compatible" />
 								<attribute name="Implementation-Version" value="${project.version}" />
-						    </manifest>
-						  </jar>
-						  <jar destfile="${project.build.directory}/jboss-seam-wls-compatible-sources.jar">
-                            <zipfileset includes="**/*" excludes="org/jboss/seam/async/TimerServiceDispatcher.java" src="${project.build.directory}/jboss-seam-sources.jar" />
-                            <manifest>
-                                <attribute name="Built-By" value="${user.name}" />
-                                <attribute name="Implementation-Vendor" value="${project.organization.name}" />
-                                <attribute name="Implementation-Title" value="JBoss Seam Weblogic compatible" />
-                                <attribute name="Implementation-Version" value="${project.version}" />
-                            </manifest>
-                          </jar>
-                     </target>
-                 </configuration>
-                 <executions>
-                      <execution>
-                          <phase>package</phase>
-                          <goals>
-                              <goal>run</goal>
-                          </goals>
-                      </execution>
-                  </executions>
-             </plugin>
+							</manifest>
+						</jar>
+						<jar
+							destfile="${project.build.directory}/${project.artifactId}-wls-compatible-sources.jar">
+							<zipfileset includes="**/*"
+								excludes="org/jboss/seam/async/TimerServiceDispatcher.java" src="${project.build.directory}/${project.artifactId}-sources.jar" />
+							<manifest>
+								<attribute name="Built-By" value="${user.name}" />
+								<attribute name="Implementation-Vendor" value="${project.organization.name}" />
+								<attribute name="Implementation-Title" value="JBoss Seam JSF2 Weblogic compatible" />
+								<attribute name="Implementation-Version" value="${project.version}" />
+							</manifest>
+						</jar>
+					</target>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 
@@ -108,12 +112,12 @@
 			<artifactId>commons-logging</artifactId>
 			<optional>true</optional>
 		</dependency>
-		
-        <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <optional>true</optional>
-        </dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<optional>true</optional>
+		</dependency>
 
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -183,13 +187,6 @@
 			<artifactId>jsr181-api</artifactId>
 			<scope>provided</scope>
 			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.faces</groupId>
-			<artifactId>jsf-api</artifactId>
-			<optional>true</optional>
-			<scope>provided</scope>
 		</dependency>
 
 		<dependency>
@@ -315,18 +312,6 @@
 		</dependency>
 
 		<dependency>
-			<groupId>org.buni.meldware</groupId>
-			<artifactId>meldware-mailjmx</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>org.buni.meldware</groupId>
-			<artifactId>meldware-mailapi</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
 			<groupId>org.drools</groupId>
 			<artifactId>drools-core</artifactId>
 			<optional>true</optional>
@@ -409,14 +394,8 @@
 		</dependency>
 
 		<dependency>
-			<groupId>quartz</groupId>
+			<groupId>org.opensymphony.quartz</groupId>
 			<artifactId>quartz</artifactId>
-			<optional>true</optional>
-		</dependency>
-
-		<dependency>
-			<groupId>javax.faces</groupId>
-			<artifactId>jsf-impl</artifactId>
 			<optional>true</optional>
 		</dependency>
 
@@ -451,12 +430,12 @@
 			<optional>true</optional>
 		</dependency>
 
-        <dependency>
-                <groupId>org.openid4java</groupId>
-                <artifactId>openid4java-consumer</artifactId>
-                <type>pom</type>
-                <optional>true</optional>
-            </dependency>
+		<dependency>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-consumer</artifactId>
+			<type>pom</type>
+			<optional>true</optional>
+		</dependency>
 
 		<dependency>
 			<groupId>org.slf4j</groupId>
@@ -465,58 +444,19 @@
 			<type>jar</type>
 			<scope>test</scope>
 		</dependency>
+		
+	        <dependency>
+	            <groupId>com.sun.faces</groupId>
+	            <artifactId>jsf-api</artifactId>
+	            <optional>true</optional>
+	            <scope>provided</scope>
+	        </dependency>
+
+	        <dependency>
+	            <groupId>com.sun.faces</groupId>
+	            <artifactId>jsf-impl</artifactId>
+	            <optional>true</optional>
+	        </dependency>
 	</dependencies>
 
-    <profiles>
-        <profile>
-            <id>code-coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>emma-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-antrun-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-surefire-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>org.sonatype.maven.plugin</groupId>
-                        <artifactId>emma4it-maven-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-        <profile>
-            <id>distribution</id>
-            <build>
-            <plugins>
-	             <plugin>
-		             <artifactId>maven-dependency-plugin</artifactId>
-		             <executions>
-		                    <execution>
-		                        <id>copy-dependencies</id>
-		                        <goals>
-		                            <goal>copy-dependencies</goal>
-		                        </goals>
-		                        <phase>package</phase>
-								<configuration>
-									<excludeGroupIds>org.jboss.seam</excludeGroupIds>
-									<excludeClassifiers>sources, project, distribution</excludeClassifiers>
-									<outputDirectory>../jar-dependencies</outputDirectory>
-									<stripVersion>true</stripVersion>
-									<type>jar</type>
-									<transitive>true</transitive>
-								</configuration>
-		                    </execution>
-		             </executions>
-	            </plugin>
-            </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>

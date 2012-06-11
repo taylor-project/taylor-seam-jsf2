@@ -2,7 +2,7 @@
 	<parent>
 		<artifactId>jboss-seam-parent</artifactId>
 		<groupId>org.jboss.seam</groupId>
-		<version>2.3.0.ALPHA</version>
+		<version>T.2.3.0-SNAPSHOT</version>
 		<relativePath>../jboss-seam-parent/pom.xml</relativePath>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
@@ -12,12 +12,6 @@
 	<name>Seam Resteasy</name>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.jboss.seam</groupId>
-			<artifactId>jboss-seam</artifactId>
-			<type>ejb</type>
-		</dependency>
-
 		<dependency>
 			<groupId>org.jboss.resteasy</groupId>
 			<artifactId>resteasy-jaxrs</artifactId>
@@ -75,51 +69,15 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-	</dependencies>
+		
+		<!-- JSF 2 -->
+		
+		<dependency>
+			<groupId>org.jboss.seam</groupId>
+			<artifactId>jboss-seam-jsf2</artifactId>
+			<type>ejb</type>
+		</dependency>
 
-    <profiles>
-        <profile>
-            <id>code-coverage</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>emma-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                      <groupId>org.apache.maven.plugins</groupId>
-                      <artifactId>maven-antrun-plugin</artifactId>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-         <profile>
-            <id>distribution</id>
-            <build>
-            <plugins>
-                 <plugin>
-                     <artifactId>maven-dependency-plugin</artifactId>
-                     <executions>
-                            <execution>
-                                <id>copy-dependencies</id>
-                                <goals>
-                                    <goal>copy-dependencies</goal>
-                                </goals>
-                                <phase>package</phase>
-                                <configuration>
-                                    <excludeGroupIds>org.jboss.seam</excludeGroupIds>
-                                    <excludeClassifiers>sources, project, distribution</excludeClassifiers>
-                                    <outputDirectory>../jar-dependencies</outputDirectory>
-                                    <stripVersion>true</stripVersion>
-                                    <type>jar</type>
-                                    <transitive>true</transitive>
-                                </configuration>
-                            </execution>
-                     </executions>
-                </plugin>
-            </plugins>
-            </build>
-        </profile>
-    </profiles>
+	</dependencies>
 
 </project>
