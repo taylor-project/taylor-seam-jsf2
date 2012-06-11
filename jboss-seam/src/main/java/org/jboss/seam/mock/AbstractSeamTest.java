@@ -118,6 +118,11 @@ public class AbstractSeamTest
       return Manager.instance().isLongRunningConversation();
    }
 
+   protected String getConversationIdParameter()
+   {
+      return "conversationId";
+   }
+   
    /**
     * Search in all contexts
     */
@@ -531,7 +536,7 @@ public class AbstractSeamTest
 
       private void saveConversationViewRoot()
       {
-         Map renderedViewRootAttributes = facesContext.getViewRoot().getAttributes();
+         Map renderedViewRootAttributes = facesContext.getViewRoot().getViewMap();
          if (renderedViewRootAttributes != null && conversationId != null)
          {
             Map conversationState = new HashMap();
@@ -728,12 +733,17 @@ public class AbstractSeamTest
 
       private void restoreViewPhase()
       {
+         if (conversationId != null)
+         {
+            setParameter(getConversationIdParameter(), conversationId);
+         }
+
          phases.beforePhase(new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE));
          try
          {
             UIViewRoot viewRoot = facesContext.getApplication().getViewHandler().createView(facesContext, getViewId());
             facesContext.setViewRoot(viewRoot);
-            Map restoredViewRootAttributes = facesContext.getViewRoot().getAttributes();
+            Map restoredViewRootAttributes = facesContext.getViewRoot().getViewMap();
             if (conversationId != null)
             {
                if (isGetRequest())
