@@ -1,10 +1,13 @@
 package org.jboss.seam.mail.ui.context;
 
+import javax.el.ELContext;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import javax.faces.context.ResponseWriter;
 
 import org.jboss.seam.jsf.DelegatingFacesContext;
+import org.jboss.seam.mail.ui.context.MailExternalContextImpl;
+import org.jboss.seam.mail.ui.context.MailResponseWriter;
 
 
 public class MailFacesContextImpl extends DelegatingFacesContext
@@ -32,6 +35,13 @@ public class MailFacesContextImpl extends DelegatingFacesContext
       return externalContext;
    }
 
+   @Override
+   public ELContext getELContext()
+   {
+
+      return getDelegate().getELContext();
+
+   }
    @Override
    public ResponseWriter getResponseWriter()
    {
