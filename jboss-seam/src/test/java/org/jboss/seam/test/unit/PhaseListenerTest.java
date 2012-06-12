@@ -41,6 +41,7 @@ import org.testng.annotations.Test;
 
 public class PhaseListenerTest
 {
+   
    private void installComponents(Context appContext)
    {
       Init init = new Init();
@@ -92,7 +93,7 @@ public class PhaseListenerTest
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();
       assert Contexts.isApplicationContextActive();
-      assert Contexts.isConversationContextActive();
+      assert !Contexts.isConversationContextActive();
       
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE ) );
       
@@ -163,7 +164,7 @@ public class PhaseListenerTest
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();
       assert Contexts.isApplicationContextActive();
-      assert Contexts.isConversationContextActive();
+      assert !Contexts.isConversationContextActive();
       
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE ) );
       
@@ -226,7 +227,7 @@ public class PhaseListenerTest
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();
       assert Contexts.isApplicationContextActive();
-      assert Contexts.isConversationContextActive();
+      assert !Contexts.isConversationContextActive();
       
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE ) );
       
@@ -257,7 +258,7 @@ public class PhaseListenerTest
       
       facesContext.getApplication().getStateManager().saveView(facesContext);
       
-      assert facesContext.getViewRoot().getViewMap().size()==1;
+      assert facesContext.getViewRoot().getViewMap().size()==2;
 
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RENDER_RESPONSE, MockLifecycle.INSTANCE ) );
 
@@ -283,7 +284,7 @@ public class PhaseListenerTest
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();
       assert Contexts.isApplicationContextActive();
-      assert Contexts.isConversationContextActive();
+      assert !Contexts.isConversationContextActive();
       
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE ) );
       
@@ -308,7 +309,7 @@ public class PhaseListenerTest
       assert !Contexts.isApplicationContextActive();
       assert !Contexts.isConversationContextActive();
    }
-
+ 
    @Test
    public void testSeamPhaseListenerNonFacesRequest()
    {
@@ -325,7 +326,7 @@ public class PhaseListenerTest
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();
       assert Contexts.isApplicationContextActive();
-      assert Contexts.isConversationContextActive();
+      assert !Contexts.isConversationContextActive();
       
       phases.afterPhase( new PhaseEvent(facesContext, PhaseId.RESTORE_VIEW, MockLifecycle.INSTANCE ) );
       
@@ -334,7 +335,7 @@ public class PhaseListenerTest
       
       phases.beforePhase( new PhaseEvent(facesContext, PhaseId.RENDER_RESPONSE, MockLifecycle.INSTANCE ) );
       
-      assert facesContext.getViewRoot().getViewMap().size()==1;
+      assert facesContext.getViewRoot().getViewMap().size()==2;
       assert ( (FacesPage) getPageMap(facesContext).get( getPrefix() + Seam.getComponentName(FacesPage.class) ) ).getConversationId()==null;
       assert Contexts.isEventContextActive();
       assert Contexts.isSessionContextActive();

@@ -377,26 +377,25 @@ public class SeamPhaseListener implements PhaseListener
     */
    protected void beforeRestoreView(FacesContext facesContext)
    {
-      FacesLifecycle.beginRequest( facesContext.getExternalContext() );
-
-      // this is the same place that WELD restores the conversation
-      Map parameters = facesContext.getExternalContext().getRequestParameterMap();
-      ConversationPropagation.instance().restoreConversationId(parameters);
-      boolean conversationFound = Manager.instance().restoreConversation();
-      FacesLifecycle.resumeConversation( facesContext.getExternalContext() );
+       FacesLifecycle.beginRequest( facesContext.getExternalContext() );
    }
    
    /**
     * Restore the page and conversation contexts during a JSF request
     */
    protected void afterRestoreView(FacesContext facesContext)
-   {
-      FacesLifecycle.resumePage();
-      Map parameters = facesContext.getExternalContext().getRequestParameterMap();
-//      ConversationPropagation.instance().restoreConversationId(parameters);
-      boolean conversationFound = Manager.instance().restoreConversation();
-//      FacesLifecycle.resumeConversation( facesContext.getExternalContext() );
-      postRestorePage(facesContext, parameters, conversationFound);
+   {	   
+	   boolean conversationFound = Contexts.isPageContextActive() ? Contexts.getPageContext().isSet("org.jboss.seam.jsf.SeamPhaseListener.conversationFound") : false;
+	   FacesLifecycle.resumePage();
+	   Map parameters = facesContext.getExternalContext().getRequestParameterMap();
+	   if (!conversationFound) // there is exceptional case when restoring of conversation wasn't called while page context was lazily initialized
+	   {
+	      ConversationPropagation.instance().restoreConversationId(parameters);
+	      conversationFound = Manager.instance().restoreConversation();
+	   }
+	   FacesLifecycle.resumeConversation( facesContext.getExternalContext() );
+	   postRestorePage(facesContext, parameters, conversationFound);
+	   
    }
 
    public void raiseEventsBeforePhase(PhaseEvent event)

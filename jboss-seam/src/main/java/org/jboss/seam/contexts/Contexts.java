@@ -6,14 +6,14 @@
  */
 package org.jboss.seam.contexts;
 
-import java.util.Map;
+import static javax.faces.event.PhaseId.RESTORE_VIEW;
 
-import javax.faces.component.UIViewRoot;
-import javax.faces.context.FacesContext;
+import java.util.Map;
 
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
 import org.jboss.seam.bpm.BusinessProcess;
+import org.jboss.seam.core.ConversationPropagation;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.core.Init;
 import org.jboss.seam.core.Manager;
@@ -92,20 +92,43 @@ public class Contexts
       return methodContext.get() != null;
    }
 
-   public static boolean isPageContextActive() 
+   /**
+    * Is PageContext set?
+    * 
+    * If not, it is lazily created in case of RESTORE_VIEW is processing
+    * This is a requirement for starting CONVERSATION - JSF2 change
+    * @return
+    */
+   public static boolean isPageContextActive()
    {
-      if (pageContext.get() == null) {
-         try {
-             // lazy initialize the page context during restore view
-             // this is similar to the ViewScopedContext.isActive() in Seam 3
-             FacesContext facesContext = FacesContext.getCurrentInstance();
-             if (facesContext != null) {
-                UIViewRoot viewRoot = facesContext.getViewRoot();
-                if (viewRoot != null) {
-                   pageContext.set( new PageContext() );
-                }
-             }
-         } catch (NoClassDefFoundError e) {} // seam-remote does not have this dependency
+      if (pageContext.get() == null)
+      {
+         log.debug("isPageContextActive is null");
+         
+         try
+         {
+            // lazy initialize the page context during restore view
+            javax.faces.context.FacesContext facesContext = javax.faces.context.FacesContext.getCurrentInstance();
+            if (facesContext != null)
+            {
+               if (FacesLifecycle.getPhaseId() == RESTORE_VIEW )
+               {
+                  log.debug("Page Context will be lazilly created");
+                  FacesLifecycle.resumePage();
+                  Map<String, String> parameters = facesContext.getExternalContext().getRequestParameterMap();
+                  ConversationPropagation.instance().restoreConversationId(parameters);
+                  boolean conversationFound = Manager.instance().restoreConversation();
+                  pageContext.get().set("org.jboss.seam.jsf.SeamPhaseListener.conversationFound", conversationFound);
+                  
+                  FacesLifecycle.resumeConversation(facesContext.getExternalContext());
+               }
+            }
+         }
+         catch (NoClassDefFoundError e)
+         {
+            // do nothing as this context is supposed to be active only with JSF view layer
+         }
+
       }
       return pageContext.get() != null;
    }
