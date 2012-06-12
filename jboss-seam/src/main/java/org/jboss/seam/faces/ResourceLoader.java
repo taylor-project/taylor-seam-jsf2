@@ -28,29 +28,39 @@ public class ResourceLoader extends org.jboss.seam.core.ResourceLoader
    @Override
    public InputStream getResourceAsStream(String resource)
    {
+      InputStream stream = null;
+       
       javax.faces.context.FacesContext context = javax.faces.context.FacesContext.getCurrentInstance();
       if (context!=null)
       {
-         return FacesResources.getResourceAsStream( resource, context.getExternalContext() );
+         stream = FacesResources.getResourceAsStream( resource, context.getExternalContext() );
       }
-      else
+      
+      if (stream == null)
       {
-         return super.getResourceAsStream(resource);
+         stream = super.getResourceAsStream(resource);
       }
+      
+      return stream;
    }
 
    @Override
    public URL getResource(String resource) 
    {
+      URL url = null;
+       
       javax.faces.context.FacesContext context = javax.faces.context.FacesContext.getCurrentInstance();
       if (context!=null)
       {
-         return FacesResources.getResource( resource, context.getExternalContext() );
+          url = FacesResources.getResource( resource, context.getExternalContext() );
       }
-      else
+      
+      if (url == null)    
       {
-         return super.getResource(resource);
+          url = super.getResource(resource);
       }
+      
+      return url;
    }
    
 }
