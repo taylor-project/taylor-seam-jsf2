@@ -2078,39 +2078,67 @@ public class Component extends Model
          }
          else if ( factoryMethod!=null && getOutScope( factoryMethod.getScope(), factoryMethod.getComponent() ).isContextActive() )
          {
-            Object factory = Component.getInstance( factoryMethod.getComponent().getName(), true );
-            factoryLock.lock();
-            try
-            {
-               // check whether there has been created an instance by another thread while waiting for this function's lock
-               if (scope != STATELESS)
+        	 Object factory = Component.getInstance(factoryMethod.getComponent().getName(), true);
+             ScopeType scopeResult = getOutScope(factoryMethod.getScope(), factoryMethod.getComponent());
+             ScopeType scopeFactory = factoryMethod.getComponent().getScope();
+             // we need this lock in the following cases: (1) the target scope is
+             // accessed by more than one thread (as we don't want to create the
+             // same object by two threads at the same time for the same scope)
+             // OR (2) the factory is accessed by more than one thread and is
+             // using interceptors (as accessing a factory multiple times might
+             // mess up interceptors). This assumes that (1) the scopes
+             // CONVERSATION, EVENT and PAGE can't be accessed by more than one
+             // thread anyway due to CONVERSATION being locked for the current
+             // thread anyway, and EVENT and PAGE being only short-lived anyway.
+             // (2) a factory that doesn't use injection can be accessed multi
+             // threaded. See JBSEAM-4669/JBSEAM-2419 for the original
+             // discussion.
+             boolean lockingNeeded = ((scopeResult != ScopeType.CONVERSATION && scopeResult != ScopeType.EVENT && scopeResult != ScopeType.PAGE) ||
+                   (scopeFactory != ScopeType.CONVERSATION && scopeFactory != ScopeType.EVENT && scopeFactory != ScopeType.PAGE && factoryMethod.getComponent().interceptionEnabled));
+
+             if (lockingNeeded)
+             {
+               // Only one factory instance can access result scope
+               // CONVERSATION / EVENT / PAGE anyway due to
+               // the locking of the conversation.
+               synchronized (factoryMethod)
                {
-                  Object value = (scope == null) ? Contexts.lookupInStatefulContexts(name) : scope.getContext().get(name);
-                  if (value != null)
-                  {
-                     return value;
-                  }
+                  return createInstanceFromFactory(name, scope, factoryMethod, factory);
                }
-               
-               if (factory==null)
-               {
-                  return null;
-               }
-               else
-               {
-                  Object result = factoryMethod.getComponent().callComponentMethod( factory, factoryMethod.getMethod() );
-                  return handleFactoryMethodResult( name, factoryMethod.getComponent(), result, factoryMethod.getScope() );
-               }
-            }
-            finally 
-            {
-               factoryLock.unlock();
-            }
-         }
-         else
+             }
+             else
+             {
+                return createInstanceFromFactory(name, scope, factoryMethod, factory);
+             }
+          }
+          else
+          {
+             return null;
+          }
+      }
+   }
+
+   private static Object createInstanceFromFactory(String name, ScopeType scope, Init.FactoryMethod factoryMethod, Object factory)
+   {
+      // check whether there has been created an instance by another thread
+      // while waiting for this function's lock
+      if (scope != STATELESS)
+      {
+         Object value = (scope == null) ? Contexts.lookupInStatefulContexts(name) : scope.getContext().get(name);
+         if (value != null)
          {
-            return null;
+            return value;
          }
+      }
+
+      if (factory == null)
+      {
+         return null;
+      }
+      else
+      {
+         Object result = factoryMethod.getComponent().callComponentMethod(factory, factoryMethod.getMethod());
+         return handleFactoryMethodResult(name, factoryMethod.getComponent(), result, factoryMethod.getScope());
       }
    }
 
