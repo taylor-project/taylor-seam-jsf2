@@ -19,7 +19,7 @@ import org.jboss.seam.contexts.Contexts;
 @Scope(ScopeType.EVENT)
 @Name("org.jboss.seam.core.locale")
 @Install(precedence = FRAMEWORK, dependencies = "org.jboss.seam.international.localeSelector")
-//@BypassInterceptors
+@BypassInterceptors
 @AutoCreate
 public class Locale extends org.jboss.seam.core.Locale {
 

@@ -10,6 +10,7 @@ import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Unwrap;
+import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.contexts.Contexts;
 
 /**
@@ -22,7 +23,7 @@ import org.jboss.seam.contexts.Contexts;
 @Name("org.jboss.seam.core.locale")
 @Install(precedence = BUILT_IN)
 @AutoCreate
-//@BypassInterceptors
+@BypassInterceptors
 public class Locale {
 
 	protected java.util.Locale locale;
