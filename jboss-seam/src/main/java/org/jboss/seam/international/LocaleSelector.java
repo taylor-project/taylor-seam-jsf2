@@ -70,6 +70,7 @@ public class LocaleSelector extends Selector
 
       if ( Events.exists() ) 
       {
+    	  Contexts.getEventContext().remove("org.jboss.seam.core.locale");
           Events.instance().raiseEvent( "org.jboss.seam.localeSelected", getLocaleString() );
       }
    }
