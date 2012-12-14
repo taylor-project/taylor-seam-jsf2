@@ -21,6 +21,7 @@ import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.contexts.Contexts;
+import org.jboss.seam.core.DefaultLocale;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.faces.Selector;
 import org.jboss.seam.util.Strings;
@@ -167,7 +168,7 @@ public class LocaleSelector extends Selector
          }
       }
 
-      return calculateLocale( Locale.getDefault() );
+      return calculateLocale( DefaultLocale.instance().getDefault());
    }
 
    public static LocaleSelector instance()
