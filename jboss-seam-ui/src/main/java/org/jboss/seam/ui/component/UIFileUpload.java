@@ -4,10 +4,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-
 import javax.el.ValueExpression;
+import javax.faces.application.FacesMessage;
 import javax.faces.component.UIInput;
 import javax.faces.context.FacesContext;
+
+import com.sun.faces.util.MessageFactory;
 
 /**
  * JSF component class
@@ -24,10 +26,33 @@ public abstract class UIFileUpload extends UIInput
 
    private InputStream localInputStream;
 
+   /**
+    *	If required check the file size of the uploaded file.
+    */
+	@Override
+	public void validate(FacesContext context) {
+		super.validate(context);
+		if (isValid()) {
+			if (isRequired() && getLocalFileSize() <= 0) {
+				String requiredMsg = getRequiredMessage();
+				FacesMessage message;
+				if (null != requiredMsg) {
+					message = new FacesMessage(FacesMessage.SEVERITY_ERROR,
+							requiredMsg, requiredMsg);
+				} else {
+					message = MessageFactory.getMessage(context,
+							REQUIRED_MESSAGE_ID,
+							MessageFactory.getLabel(context, this));
+				}
+				context.addMessage(getClientId(context), message);
+				setValid(false);
+			}
+		}
+	}
+   
    @Override
    public void processUpdates(FacesContext context)
    {
-      
       // Skip processing if rendered flag is false.
       // this logic is in javax.faces.component.UIInput.processUpdates(FacesContext context) 
       if (!isRendered()) {
