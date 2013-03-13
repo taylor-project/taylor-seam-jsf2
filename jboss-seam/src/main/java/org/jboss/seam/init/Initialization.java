@@ -477,6 +477,8 @@ public class Initialization
       Boolean startup = startupAttribute==null ? null : Boolean.parseBoolean(startupAttribute);
       String startupDependsAttribute = component.attributeValue("startupDepends");
       String[] startupDepends = startupDependsAttribute==null ? new String[0] : startupDependsAttribute.split(" ");
+      
+      boolean higherPrecedence = true;
 
       if (className != null)
       {
@@ -495,7 +497,7 @@ public class Initialization
          }
 
          ComponentDescriptor descriptor = new ComponentDescriptor(name, clazz, scope, autoCreate, startup, startupDepends, jndiName, installed, precedence);
-         addComponentDescriptor(descriptor);
+         higherPrecedence = addComponentDescriptor(descriptor);
          installedComponentClasses.add(clazz);
       }
       else if (name == null)
@@ -511,7 +513,9 @@ public class Initialization
             propName = prop.getQName().getName();
          }
          String qualifiedPropName = name + '.' + toCamelCase(propName, false);
-         properties.put( qualifiedPropName, getPropertyValue(prop, qualifiedPropName, replacements) );
+         if (!properties.containsKey( qualifiedPropName) || higherPrecedence) {
+             properties.put( qualifiedPropName, getPropertyValue(prop, qualifiedPropName, replacements) );        	 
+         }
       }
       
       for ( Attribute prop: (List<Attribute>) component.attributes() )
@@ -523,8 +527,10 @@ public class Initialization
             Conversions.PropertyValue propValue = null;
             try
             {
-               propValue = getPropertyValue(prop, replacements);
-               properties.put( qualifiedPropName, propValue );
+                if (!properties.containsKey( qualifiedPropName) || higherPrecedence) {
+                    propValue = getPropertyValue(prop, replacements);
+                    properties.put( qualifiedPropName, propValue );               	 
+                }
             }
             catch (Exception ex)
             {
@@ -570,7 +576,7 @@ public class Initialization
       return clazz;
    }
 
-   private void addComponentDescriptor(ComponentDescriptor descriptor)
+   private boolean addComponentDescriptor(ComponentDescriptor descriptor)
    {
       String name = descriptor.getName();
       
@@ -607,6 +613,8 @@ public class Initialization
                   (other != null ? other.getComponentClass().getName() : "<unknown>"));
          }
       }
+      // has higher precedence or not
+      return set.iterator().next().equals(descriptor);
    }
 
    private Conversions.PropertyValue getPropertyValue(Attribute prop, Properties replacements)
