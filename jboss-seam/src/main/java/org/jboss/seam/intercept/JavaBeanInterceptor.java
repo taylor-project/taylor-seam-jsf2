@@ -94,8 +94,13 @@ public class JavaBeanInterceptor extends RootInterceptor
         } // JBSEAM-5066 - we need to skip the interceptInvocation in case of Object.equals(otherObject)
         else if (  params.length==1 && method.getName().equals("equals") && (params[0] != proxy))
         {
-           return proceed.invoke(bean, params);
+             if (proceed.getDeclaringClass().isAssignableFrom(bean.getClass()))
+                    return proceed.invoke(bean, params);
+             else {
+                    return false;
+             }
         }
+
      }
 
      if ( markDirty(method) )
