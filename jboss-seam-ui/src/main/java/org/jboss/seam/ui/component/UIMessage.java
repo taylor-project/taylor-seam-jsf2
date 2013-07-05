@@ -25,18 +25,10 @@ import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlMessage;
 
-import org.richfaces.cdk.annotations.Description;
-import org.richfaces.cdk.annotations.JsfComponent;
-import org.richfaces.cdk.annotations.Tag;
-
 /**
  * JSF component class
  *
  */
-@JsfComponent(description=@Description(displayName="org.jboss.seam.ui.Message",value="Decorate a JSF input field with the validation error message."),
-family="javax.faces.Message", type="org.jboss.seam.ui.Message",generate="org.jboss.seam.ui.component.html.HtmlMessage", 
-tag = @Tag(baseClass="org.jboss.seam.ui.util.cdk.UIComponentTagBase", name="message"), 
-attributes = {"message.xml" })
 public abstract class UIMessage extends HtmlMessage implements UIDecorateAware {
 
    protected UIDecorate decorate;
@@ -75,15 +67,15 @@ public abstract class UIMessage extends HtmlMessage implements UIDecorateAware {
          return forId;
       }
    }
-   
+
    private static String getFor(UIComponent component)
    {
-      
+
       if ( component.getParent()==null )
       {
          return null;
       }
-      else if (component instanceof UIDecorate) 
+      else if (component instanceof UIDecorate)
       {
          return getInputId(component);
       }
@@ -99,7 +91,7 @@ public abstract class UIMessage extends HtmlMessage implements UIDecorateAware {
       if(decorate != null) {
          return getFor(decorate);
       }
-      
+
       return getFor(this);
    }
 

@@ -15,16 +15,14 @@ import org.jboss.seam.ui.component.UIDecorateAware;
 import org.jboss.seam.ui.util.Decoration;
 import org.jboss.seam.ui.util.HTML;
 import org.jboss.seam.ui.util.cdk.RendererBase;
-import org.richfaces.cdk.annotations.JsfRenderer;
 
-@JsfRenderer(type="org.jboss.seam.ui.DecorateRenderer", family="org.jboss.seam.ui.DecorateRenderer")
 public class DecorateRendererBase extends RendererBase
 {
    // Place the attributes you want to store away
    private Map<String, Object> originalValues = new HashMap();
    // The list of attributes in the event scope to store away
    String[] storeOriginals = new String[] {"invalid", "required"};
-   
+
    @Override
    protected Class getComponentClass()
    {
@@ -48,7 +46,7 @@ public class DecorateRendererBase extends RendererBase
 
    /**
     * Store away the attribute from the event context (if it is set)
-    * 
+    *
     * @param names The list of context keys to store away
     * @param context The context to target
     */
@@ -62,12 +60,12 @@ public class DecorateRendererBase extends RendererBase
          }
       }
    }
-   
+
    /**
     * Restores the state of the event context. If the value is stored away, it is restored
     * It it was not in the map, it was not in the context in the first place so clean
     * up what we have placed there during this run.
-    * 
+    *
     * @param names The list of context keys to restore
     * @param context The context to target
     */
