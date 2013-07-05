@@ -4,9 +4,9 @@ import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.component.html.HtmlOutputLabel;
 
-
-public abstract class UILabel extends HtmlOutputLabel
+public abstract class UILabel extends HtmlOutputLabel implements UIDecorateAware
 {
+   protected UIDecorate decorate;
 
    /**
     * A depth-first search for an EditableValueHolder
@@ -42,15 +42,15 @@ public abstract class UILabel extends HtmlOutputLabel
          return forId;
       }
    }
-   
+
    private static String getFor(UIComponent component)
    {
-      
+
       if ( component.getParent()==null )
       {
          return null;
       }
-      else if (component instanceof UIDecorate) 
+      else if (component instanceof UIDecorate)
       {
          return getInputId(component);
       }
@@ -63,7 +63,14 @@ public abstract class UILabel extends HtmlOutputLabel
    @Override
    public String getFor()
    {
+      if(decorate != null) {
+         return getFor(decorate);
+      }
       return getFor(this);
    }
 
+   @Override
+   public void setUIDecorate(UIDecorate decorate) {
+      this.decorate = decorate;
+   }
 }

@@ -11,6 +11,7 @@ import javax.faces.context.ResponseWriter;
 import org.jboss.seam.contexts.Context;
 import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.ui.component.UIDecorate;
+import org.jboss.seam.ui.component.UIDecorateAware;
 import org.jboss.seam.ui.util.Decoration;
 import org.jboss.seam.ui.util.HTML;
 import org.jboss.seam.ui.util.cdk.RendererBase;
@@ -20,17 +21,32 @@ public class DecorateRendererBase extends RendererBase
    // Place the attributes you want to store away
    private Map<String, Object> originalValues = new HashMap();
    // The list of attributes in the event scope to store away
-   String[] storeOriginals = new String[] {"invalid", "required"}; 
-   
+   String[] storeOriginals = new String[] {"invalid", "required"};
+
    @Override
    protected Class getComponentClass()
    {
       return UIDecorate.class;
    }
 
+   private static void setUIDecorate(UIComponent component, UIDecorate decorator)
+   {
+      if (component instanceof UIDecorateAware)
+      {
+         ((UIDecorateAware)component).setUIDecorate(decorator);
+      }
+      for (Object child: component.getChildren())
+      {
+         if (child instanceof UIComponent)
+         {
+            setUIDecorate((UIComponent)child, decorator);
+         }
+      }
+   }
+
    /**
     * Store away the attribute from the event context (if it is set)
-    * 
+    *
     * @param names The list of context keys to store away
     * @param context The context to target
     */
@@ -44,12 +60,12 @@ public class DecorateRendererBase extends RendererBase
          }
       }
    }
-   
+
    /**
     * Restores the state of the event context. If the value is stored away, it is restored
     * It it was not in the map, it was not in the context in the first place so clean
     * up what we have placed there during this run.
-    * 
+    *
     * @param names The list of context keys to restore
     * @param context The context to target
     */
@@ -93,12 +109,12 @@ public class DecorateRendererBase extends RendererBase
       UIComponent aroundInvalidDecoration = decorate.getDecoration("aroundInvalidField");
       if (aroundDecoration != null && !hasMessage)
       {
-         aroundDecoration.setParent(decorate);
+         setUIDecorate(aroundDecoration, decorate);
          aroundDecoration.encodeBegin(context);
       }
       if (aroundInvalidDecoration != null && hasMessage)
       {
-         aroundInvalidDecoration.setParent(decorate);
+         setUIDecorate(aroundInvalidDecoration, decorate);
          aroundInvalidDecoration.encodeBegin(context);
       }
    }
@@ -113,12 +129,12 @@ public class DecorateRendererBase extends RendererBase
       UIComponent aroundInvalidDecoration = decorate.getDecoration("aroundInvalidField");
       if (aroundDecoration != null && !hasMessage)
       {
-         aroundDecoration.setParent(decorate);
+         setUIDecorate(aroundDecoration, decorate);
          aroundDecoration.encodeEnd(context);
       }
       if (aroundInvalidDecoration != null && hasMessage)
       {
-         aroundInvalidDecoration.setParent(decorate);
+         setUIDecorate(aroundInvalidDecoration, decorate);
          aroundInvalidDecoration.encodeEnd(context);
       }
       if (decorate.isEnclose())
@@ -140,12 +156,12 @@ public class DecorateRendererBase extends RendererBase
       UIComponent beforeInvalidDecoration = decorate.getDecoration("beforeInvalidField");
       if (beforeDecoration != null && !hasMessage)
       {
-         beforeDecoration.setParent(decorate);
+         setUIDecorate(beforeDecoration, decorate);
          renderChild(context, beforeDecoration);
       }
       if (beforeInvalidDecoration != null && hasMessage)
       {
-         beforeInvalidDecoration.setParent(decorate);
+         setUIDecorate(beforeInvalidDecoration, decorate);
          renderChild(context, beforeInvalidDecoration);
       }
 
@@ -155,12 +171,12 @@ public class DecorateRendererBase extends RendererBase
       UIComponent afterInvalidDecoration = decorate.getDecoration("afterInvalidField");
       if (afterDecoration != null && !hasMessage)
       {
-         afterDecoration.setParent(decorate);
+         setUIDecorate(afterDecoration, decorate);
          renderChild(context, afterDecoration);
       }
       if (afterInvalidDecoration != null && hasMessage)
       {
-         afterInvalidDecoration.setParent(decorate);
+         setUIDecorate(afterInvalidDecoration, decorate);
          renderChild(context, afterInvalidDecoration);
       }
    }
