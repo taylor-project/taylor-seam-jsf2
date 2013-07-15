@@ -51,7 +51,7 @@ public class FacesSecurityEvents
 
    public Severity getLoginFailedMessageSeverity()
    {
-      return Severity.INFO;
+      return Severity.ERROR;
    }
 
    public String getLoginFailedMessageKey()
