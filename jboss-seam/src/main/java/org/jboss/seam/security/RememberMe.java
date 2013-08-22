@@ -43,7 +43,7 @@ public class RememberMe implements Serializable
       @Override
       public String getCookieName()
       {
-         return "org.jboss.seam.security.username";
+         return getUserCookieName();
       }       
       
       @Override
@@ -76,7 +76,7 @@ public class RememberMe implements Serializable
       @Override
       public String getCookieName()
       {
-         return "org.jboss.seam.security.authtoken";
+         return getTokenCookieName();
       }
    }
    
@@ -182,6 +182,14 @@ public class RememberMe implements Serializable
    {
       this.tokenStore = tokenStore;
    }
+   
+   public String getUserCookieName() {
+		return "org.jboss.seam.security.username";
+	}
+	
+   public String getTokenCookieName() {
+		return "org.jboss.seam.security.authtoken";
+	}
    
    @Create
    public void create()
