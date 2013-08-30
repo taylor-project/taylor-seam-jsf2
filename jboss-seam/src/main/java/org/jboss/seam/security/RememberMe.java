@@ -254,7 +254,11 @@ public class RememberMe implements Serializable
             setEnabled(true);
             credentials.setUsername(username);
          }
-               
+         else 
+         {	 
+        	setEnabled(false);
+        	credentials.setUsername(null);
+         }      
          usernameSelector.setDirty();
       }
       else if (mode.equals(Mode.autoLogin))
