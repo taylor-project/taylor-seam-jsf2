@@ -1607,14 +1607,14 @@
 
 	<distributionManagement>
 		<repository>
-			<id>maven2-repository</id>
-			<name>Maven2 Repository</name>
-			<url>file:///Users/jgilbert/Documents/m2-repo</url>
+			<id>taylor-maven2-repository</id>
+			<name>Taylor Maven2 Repository</name>
+			<url>sftp://web.sourceforge.net/home/project-web/taylor/htdocs/maven2</url>
 		</repository>	
 		<snapshotRepository>
-			<id>maven2-snapshot-repository</id>
-			<name>Maven2 Snapshot Repository</name>
-			<url>file:///Users/jgilbert/Documents/m2-repo</url>
+			<id>taylor-maven2-snapshot-repository</id>
+			<name>Taylor Maven2 Snapshot Repository</name>
+			<url>sftp://web.sourceforge.net/home/project-web/taylor/htdocs/maven2</url>
 			<uniqueVersion>false</uniqueVersion>
 		</snapshotRepository>
 	</distributionManagement>
