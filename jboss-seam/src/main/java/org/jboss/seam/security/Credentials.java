@@ -12,6 +12,7 @@ import javax.security.auth.callback.NameCallback;
 import javax.security.auth.callback.PasswordCallback;
 import javax.security.auth.callback.UnsupportedCallbackException;
 
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
 import org.jboss.seam.annotations.Scope;
@@ -38,6 +39,14 @@ public class Credentials implements Serializable
    
    private boolean initialized;
    
+	@Create
+	public void init() {
+		if (Events.exists()) {
+			setInitialized(true);
+			Events.instance().raiseEvent(EVENT_INIT_CREDENTIALS, this);
+		}
+	}
+
    public boolean isInitialized()
    {
       return initialized;
@@ -50,12 +59,6 @@ public class Credentials implements Serializable
    
    public String getUsername()
    {
-      if (!isInitialized() && Events.exists())
-      {
-         setInitialized(true);
-         Events.instance().raiseEvent(EVENT_INIT_CREDENTIALS, this);
-      }
-      
       return username;
    }
    
