@@ -1,0 +1,2 @@
+language: java
+script: "cd jboss-seam-parent; mvn clean install"
