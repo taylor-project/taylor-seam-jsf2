@@ -2,7 +2,7 @@ env:
   global: 
   - secure: YZb6o2m0kGbXA/Mimt0sxtEEmkI7nKlxMbjfJYsVpgjyBTazGM1pI13n6rE07JoAYUWN7cVnu/jsKYrAgf50bPswlRsubsvfUjNGof/K46DZlCYL6ZNlQq0/CKcyp5wO2Eb0pf6E5nML8nVwTcjeQP9HDgP6/CniUECswhiDHI4=
   - secure: ev/MzySV1USwZGyM5h2VbWqSkV6r4GzZPSRoPxpymjyr6Vdb/nN5gJF/3Z5OQoChMu2aepdOxT/hKHoEQdZp5e/VOVSDEU8RpoeUkGG8+xbib6I4VbnqxI4vdwIfyvhIKKmG0QtZDdy/FW2fCbtA2jxOeSN2dy/8JVsWGG0mRIo=
-script: cd jboss-seam-parent; mvn clean install deploy --settings jboss-seam-parent/settings.xml
+script: cd jboss-seam-parent; mvn clean install deploy --settings settings.xml
 language: java
 notifications:
   email:
