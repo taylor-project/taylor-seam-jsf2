@@ -7,5 +7,3 @@ language: java
 notifications:
   email:
   - michael.donovan@danteinc.com
-  - charles.zhao@danteinc.com
-  - john.gilbert@danteinc.com
