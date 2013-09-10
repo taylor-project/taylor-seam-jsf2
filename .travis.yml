@@ -7,6 +7,9 @@ notifications:
   email:
   - michael.donovan@danteinc.com
 before_script:
-  - echo -e "Host web.sourceforge.net\n\tStrictHostKeyChecking no\n\tUserKnownHostsFile=/dev/null\n" >> ~/.ssh/config; chmod 600 ~/.ssh/config
+  - echo "Host web.sourceforge.net" >> ~/.ssh/config
+  - echo "	StrictHostKeyChecking no" >> ~/.ssh/config
+  - echo "	CheckHostIP no" >> ~/.ssh/config
+  - echo "	UserKnownHostsFile=/dev/null" >> ~/.ssh/config
   - cat ~/.ssh/config
 script: cd jboss-seam-parent; mvn clean install deploy --settings settings.xml
