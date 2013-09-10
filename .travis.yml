@@ -4,3 +4,8 @@ env:
   - secure: ev/MzySV1USwZGyM5h2VbWqSkV6r4GzZPSRoPxpymjyr6Vdb/nN5gJF/3Z5OQoChMu2aepdOxT/hKHoEQdZp5e/VOVSDEU8RpoeUkGG8+xbib6I4VbnqxI4vdwIfyvhIKKmG0QtZDdy/FW2fCbtA2jxOeSN2dy/8JVsWGG0mRIo=
 script: cd jboss-seam-parent; mvn clean install deploy --settings jboss-seam-parent/settings.xml
 language: java
+notifications:
+  email:
+  - michael.donovan@danteinc.com
+  - charles.zhao@danteinc.com
+  - john.gilbert@danteinc.com
