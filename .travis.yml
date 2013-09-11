@@ -6,11 +6,16 @@ language: java
 notifications:
   email:
   - michael.donovan@danteinc.com
-before_script:
-  - echo "Host web.sourceforge.net" >> ~/.ssh/config
-  - echo "	StrictHostKeyChecking no" >> ~/.ssh/config
-  - echo "	CheckHostIP no" >> ~/.ssh/config
-  - echo "	UserKnownHostsFile=/dev/null" >> ~/.ssh/config
-  - chmod 600 ~/.ssh/config
-  - cat ~/.ssh/config
-script: cd jboss-seam-parent; mvn clean install deploy --settings settings.xml
+#before_script:
+#  - echo "Host web.sourceforge.net" >> ~/.ssh/config
+#  - echo "	StrictHostKeyChecking no" >> ~/.ssh/config
+#  - echo "	CheckHostIP no" >> ~/.ssh/config
+#  - echo "	UserKnownHostsFile=/dev/null" >> ~/.ssh/config
+#  - chmod 600 ~/.ssh/config
+#  - cat ~/.ssh/config
+script: 
+  - echo "#!/usr/bin/expect" >> ~/build.sh
+  - echo "spawn cd jboss-seam-parent; mvn clean install deploy --settings settings.xml" >> ~/build.sh
+  - echo "expect \"Are you sure you want to continue connecting? (yes/no):\" { send \"yes\" }"
+  - chmod +x ~/build.sh
+  - ~/build.sh
