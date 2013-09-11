@@ -13,10 +13,11 @@ notifications:
 #  - echo "	UserKnownHostsFile=/dev/null" >> ~/.ssh/config
 #  - chmod 600 ~/.ssh/config
 #  - cat ~/.ssh/config
-script: 
-  - echo "#!/usr/bin/expect" >> ~/expect-build.sh
+before_script: 
+  - echo "#!/usr/bin/expect -f" >> ~/expect-build.sh
   - echo "spawn cd jboss-seam-parent; mvn clean install deploy --settings settings.xml" >> ~/expect-build.sh
   - echo "expect \"Are you sure you want to continue connecting? (yes/no):\" { send \"yes\" }" >> ~/expect-build.sh
   - chmod +x ~/expect-build.sh
   - cat ~/expect-build.sh
+script:
   - ~/expect-build.sh
