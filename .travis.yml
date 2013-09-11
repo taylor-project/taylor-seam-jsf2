@@ -14,6 +14,7 @@ notifications:
 #  - chmod 600 ~/.ssh/config
 #  - cat ~/.ssh/config
 before_script: 
+  - which expect
   - echo "#!/usr/bin/expect -f" >> ~/expect-build.sh
   - echo "spawn cd jboss-seam-parent; mvn clean install deploy --settings settings.xml" >> ~/expect-build.sh
   - echo "expect \"Are you sure you want to continue connecting? (yes/no):\" { send \"yes\" }" >> ~/expect-build.sh
