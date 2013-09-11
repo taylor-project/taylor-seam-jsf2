@@ -18,4 +18,5 @@ script:
   - echo "spawn cd jboss-seam-parent; mvn clean install deploy --settings settings.xml" >> ~/expect-build.sh
   - echo "expect \"Are you sure you want to continue connecting? (yes/no):\" { send \"yes\" }" >> ~/expect-build.sh
   - chmod +x ~/expect-build.sh
-  - ~/build.sh
+  - cat ~/expect-build.sh
+  - ~/expect-build.sh
