@@ -6,20 +6,6 @@ language: java
 notifications:
   email:
   - michael.donovan@danteinc.com
-#before_script:
-#  - echo "Host web.sourceforge.net" >> ~/.ssh/config
-#  - echo "	StrictHostKeyChecking no" >> ~/.ssh/config
-#  - echo "	CheckHostIP no" >> ~/.ssh/config
-#  - echo "	UserKnownHostsFile=/dev/null" >> ~/.ssh/config
-#  - chmod 600 ~/.ssh/config
-#  - cat ~/.ssh/config
-#before_script: 
-#  - which expect
-#  - echo "#!/usr/bin/expect -f" >> ~/expect-build.sh
-#  - echo "spawn cd jboss-seam-parent; mvn clean install deploy --settings settings.xml" >> ~/expect-build.sh
-#  - echo "expect \"Are you sure you want to continue connecting? (yes/no):\" { send \"yes\" }" >> ~/expect-build.sh
-#  - chmod +x ~/expect-build.sh
-#  - cat ~/expect-build.sh
 before_script:
   - echo "web.sourceforge.net ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==" >> ~/.ssh/known_hosts
 script:
