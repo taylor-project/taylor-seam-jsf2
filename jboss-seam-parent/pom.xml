@@ -1595,26 +1595,9 @@
 
 	<repositories>
 		<repository>
-			<id>maven</id>
-			<name>Maven Central</name>
-			<url>http://repo1.maven.org/maven2</url>
-		</repository>
-		<repository>
-			<id>jboss</id>
-			<name>JBoss Repository</name>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
 			<url>https://repository.jboss.org/nexus/content/groups/public</url>
-		</repository>
-		<repository>
-			<id>jboss-releases-repository</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/releases/</url>
-		</repository>
-		<repository>
-			<id>jboss-snapshots-repository</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/snapshots/</url>
-		</repository>
-		<repository>
-			<id>third-party-repository</id>
-			<url>https://repository.jboss.org/nexus/content/repositories/thirdparty-releases/</url>
 		</repository>
 	</repositories>
 
@@ -1623,6 +1606,11 @@
 			<id>atlassian</id>
 			<name>atlassian Artifactory Repository</name>
 			<url>https://maven.atlassian.com/content/groups/public</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
 		</pluginRepository>
 	</pluginRepositories>
 
