@@ -4,7 +4,7 @@
 	<groupId>org.jboss.seam</groupId>
 	<artifactId>jboss-seam-parent</artifactId>
 	<name>Seam Parent</name>
-	<version>T.2.3.1</version>
+	<version>TRUNK-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<licenses>
