@@ -125,6 +125,10 @@ public class UIImage extends UIRectangle {
     public void createITextObject(FacesContext context) throws IOException,
             DocumentException {
         value = valueBinding(context, "value", value);
+        
+        if(value == null) {
+        	return;
+        }
 
         // instance() doesn't work here - we need a new instance
         org.jboss.seam.ui.graphicImage.Image seamImage = new org.jboss.seam.ui.graphicImage.Image();
