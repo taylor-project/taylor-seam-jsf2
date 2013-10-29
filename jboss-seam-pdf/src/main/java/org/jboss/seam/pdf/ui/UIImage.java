@@ -146,6 +146,11 @@ public class UIImage extends UIRectangle {
         }
 
         byte[] data = seamImage.getImage();
+        
+        if(data == null || data.length == 0) {
+            return;
+        }
+
         image = Image.getInstance(data);
 
         rotation = (Float) valueBinding(context, "rotation", rotation);
