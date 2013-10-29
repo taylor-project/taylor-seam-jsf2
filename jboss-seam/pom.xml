@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>org.jboss.seam</groupId>
 		<artifactId>jboss-seam-parent</artifactId>
-		<version>TRUNK-SNAPSHOT</version>
+		<version>T.2.3.2</version>
 		<relativePath>../jboss-seam-parent/pom.xml</relativePath>
 	</parent>
 
