@@ -128,6 +128,15 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       String jobName = nextUniqueName();
       String triggerName = nextUniqueName();
       
+      if (async instanceof AsynchronousInvocation) {
+          jobName = ((AsynchronousInvocation) async).getComponentName();
+          triggerName = jobName + "Trigger";
+      }
+      
+      if (scheduler.getJobDetail(jobName, null) != null) {
+          return new QuartzTriggerHandle(triggerName);
+      }
+      
       JobDetail jobDetail = new JobDetail(jobName, null, QuartzJob.class);
       jobDetail.getJobDataMap().put("async", async);
 
