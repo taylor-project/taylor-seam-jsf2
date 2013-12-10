@@ -9,12 +9,11 @@ import java.util.Date;
 
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
+import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Scope;
-import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.intercept.InvocationContext;
 import org.jboss.seam.log.LogProvider;
@@ -36,7 +35,7 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author Michael Yuan
  *
  */
-@Startup
+//@Startup
 @Scope(ScopeType.APPLICATION)
 @Name("org.jboss.seam.async.dispatcher")
 @Install(value=false, precedence=BUILT_IN)
@@ -48,7 +47,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
    
    private Scheduler scheduler;
 
-   @Create
+   @Observer("org.jboss.seam.postInitialization")
    public void initScheduler() throws SchedulerException
    {
        StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
@@ -128,6 +127,15 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
    {
       String jobName = nextUniqueName();
       String triggerName = nextUniqueName();
+      
+      if (async instanceof AsynchronousInvocation) {
+          jobName = ((AsynchronousInvocation) async).getComponentName();
+          triggerName = jobName + "Trigger";
+      }
+      
+      if (scheduler.getJobDetail(jobName, null) != null) {
+          return new QuartzTriggerHandle(triggerName);
+      }
       
       JobDetail jobDetail = new JobDetail(jobName, null, QuartzJob.class);
       jobDetail.getJobDataMap().put("async", async);
