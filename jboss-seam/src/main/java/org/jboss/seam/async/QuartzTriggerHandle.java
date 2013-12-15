@@ -15,14 +15,16 @@ import org.quartz.Trigger;
 public class QuartzTriggerHandle implements Serializable
 {
    private final String triggerName;
+   private final String schedulerName;
    
    // Hold a transient reference to the scheduler to allow control of the
    // scheduler outside of Seam contexts (useful in a testing context)
    private transient Scheduler scheduler;
      
-   public QuartzTriggerHandle(String triggerName) 
+   public QuartzTriggerHandle(String triggerName, String  schedulerName) 
    {
       this.triggerName = triggerName; 
+      this.schedulerName = schedulerName;
    }
 
    public void cancel() throws SchedulerException
@@ -49,7 +51,7 @@ public class QuartzTriggerHandle implements Serializable
    {
        if (scheduler == null)
        {
-           scheduler = QuartzDispatcher.instance().getScheduler();
+           scheduler = QuartzDispatcher.instance(schedulerName).getScheduler();
        }
        return scheduler;
    }

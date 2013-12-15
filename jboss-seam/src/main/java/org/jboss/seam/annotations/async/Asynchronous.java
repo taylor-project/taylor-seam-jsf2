@@ -32,4 +32,7 @@ import java.lang.annotation.Target;
 @Target(METHOD)
 @Retention(RUNTIME)
 @Documented
-public @interface Asynchronous {}
+public @interface Asynchronous {
+	
+	   String dispatcher() default "";
+}

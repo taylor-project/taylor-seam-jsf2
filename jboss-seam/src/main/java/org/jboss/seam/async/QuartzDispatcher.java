@@ -9,6 +9,7 @@ import java.util.Date;
 
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
+import org.jboss.seam.Seam;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
@@ -16,7 +17,7 @@ import org.jboss.seam.annotations.Observer;
 import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.intercept.InvocationContext;
-import org.jboss.seam.log.LogProvider;
+import org.jboss.seam.log.Log;
 import org.jboss.seam.log.Logging;
 import org.quartz.CronTrigger;
 import org.quartz.Job;
@@ -43,28 +44,47 @@ import org.quartz.impl.StdSchedulerFactory;
 public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Schedule>
 {
    
-   private static final LogProvider log = Logging.getLogProvider(QuartzDispatcher.class);
+   private static final Log log = Logging.getLog(QuartzDispatcher.class);
    
    private Scheduler scheduler;
 
-   @Observer("org.jboss.seam.postInitialization")
+   private String propertiesFileName;
+
+   public String getPropertiesFileName() {
+      return propertiesFileName;
+   }
+
+   public void setPropertiesFileName(String propertiesFileName) {
+      this.propertiesFileName = propertiesFileName;
+   }
+
+@Observer("org.jboss.seam.postInitialization")
    public void initScheduler() throws SchedulerException
    {
        StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
-
-       //TODO: magical properties files are *not* the way to config Seam apps!
-       InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("seam.quartz.properties");
-       if (is != null)
-       {
-         schedulerFactory.initialize(is);
-         log.debug("Found seam.quartz.properties file. Using it for Quartz config.");
-       } 
-       else 
-       {
-         schedulerFactory.initialize();
-         log.warn("No seam.quartz.properties file. Using in-memory job store.");
+       
+       if (propertiesFileName != null) {
+           InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream(propertiesFileName);
+           if (is != null)
+           {
+             schedulerFactory.initialize(is);
+             log.debug("Found #0 file. Using it for Quartz config.", propertiesFileName);
+           } 
+       } else {
+           //TODO: magical properties files are *not* the way to config Seam apps!
+           InputStream is = Thread.currentThread().getContextClassLoader().getResourceAsStream("seam.quartz.properties");
+           if (is != null)
+           {
+             schedulerFactory.initialize(is);
+             log.debug("Found seam.quartz.properties file. Using it for Quartz config.");
+           } 
+           else 
+           {
+             schedulerFactory.initialize();
+             log.warn("No seam.quartz.properties file. Using in-memory job store.");
+           }
        }
-    
+
        scheduler = schedulerFactory.getScheduler();
        scheduler.start();
    }
@@ -81,7 +101,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       try 
       {
         scheduler.scheduleJob(jobDetail, trigger);
-        return new QuartzTriggerHandle(triggerName);
+        return new QuartzTriggerHandle(triggerName, getSchedulerName());
       } 
       catch (Exception se) 
       {
@@ -134,11 +154,12 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       }
       
       if (scheduler.getJobDetail(jobName, null) != null) {
-          return new QuartzTriggerHandle(triggerName);
+          return new QuartzTriggerHandle(triggerName, getSchedulerName());
       }
       
       JobDetail jobDetail = new JobDetail(jobName, null, QuartzJob.class);
       jobDetail.getJobDataMap().put("async", async);
+      jobDetail.getJobDataMap().put("schedulerName", getSchedulerName());
 
       if (schedule instanceof CronSchedule) 
       {
@@ -220,7 +241,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
           throw new IllegalArgumentException("unrecognized schedule type");
       }
 
-      return new QuartzTriggerHandle(triggerName);
+      return new QuartzTriggerHandle(triggerName, getSchedulerName());
    }
    
    private String nextUniqueName ()
@@ -245,7 +266,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       {
          JobDataMap dataMap = context.getJobDetail().getJobDataMap();
          async = (Asynchronous)dataMap.get("async");
-         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName());
+         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName(), (String) dataMap.get("schdeulerName"));
          try
          {
             async.execute(handle);
@@ -262,11 +283,13 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       return scheduler;
    }
    
+   public String getSchedulerName() {
+	   return Seam.getComponentName(getClass());
+   }
 
-
-   public static QuartzDispatcher instance()
+   public static QuartzDispatcher instance(String name)
    {
-      return (QuartzDispatcher) AbstractDispatcher.instance();
+      return (QuartzDispatcher) AbstractDispatcher.instance(name);
    }
 
 }

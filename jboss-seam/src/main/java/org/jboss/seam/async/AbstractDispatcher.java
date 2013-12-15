@@ -78,11 +78,16 @@ public abstract class AbstractDispatcher<T, S extends Schedule> implements Dispa
       
    public static Dispatcher instance()
    {
+      return instance("org.jboss.seam.async.dispatcher");         
+   }
+   
+   public static Dispatcher instance(String name)
+   {
       if ( !Contexts.isApplicationContextActive() )
       {
          throw new IllegalStateException("no application context active");
       }
-      return (Dispatcher) Component.getInstance("org.jboss.seam.async.dispatcher");         
+      return (Dispatcher) Component.getInstance(name);         
    }
    
    public void scheduleTransactionSuccessEvent(String type, Object... parameters)
