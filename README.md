@@ -1,6 +1,8 @@
 taylor-seam-jsf2
 ================
 
+![](https://travis-ci.org/taylor-project/taylor-seam-jsf2.png?branch=master)
+
 This project is a fork of JBoss Seam 2 for the purpuses of supporting JSF2 and only JSF2.
 
 JBoss Seam 2.3 supports JSF2, but also requires FULL JEE6 support.
