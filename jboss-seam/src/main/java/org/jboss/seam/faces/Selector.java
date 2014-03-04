@@ -1,9 +1,14 @@
 package org.jboss.seam.faces;
 
 import java.io.Serializable;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 
 import javax.faces.context.FacesContext;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.seam.core.AbstractMutable;
@@ -108,15 +113,42 @@ public abstract class Selector extends AbstractMutable implements Serializable
     */
    protected void setCookieValueIfEnabled(String value)
    {
-      FacesContext ctx = FacesContext.getCurrentInstance();
-      
-      if ( isCookieEnabled() && ctx != null)
-      {
-         HttpServletResponse response = (HttpServletResponse) ctx.getExternalContext().getResponse();
-         Cookie cookie = new Cookie( getCookieName(), value );
-         cookie.setMaxAge( getCookieMaxAge() );
-         cookie.setPath(cookiePath);
-         response.addCookie(cookie);
-      }
+		FacesContext ctx = FacesContext.getCurrentInstance();
+		if (isCookieEnabled() && ctx != null) {
+			HttpServletRequest request = (HttpServletRequest) ctx
+					.getExternalContext().getRequest();
+			HttpServletResponse response = (HttpServletResponse) ctx
+					.getExternalContext().getResponse();
+
+			response.addHeader("SET-COOKIE",
+					constructCookieHeader(value, request.isSecure()));
+		}
    }
+   
+	private String constructCookieHeader(String value, boolean secure) {
+		StringBuilder builder = new StringBuilder();
+
+		builder.append(getCookieName()).append("=").append(value);
+
+		if (getCookiePath() != null) {
+			builder.append("; Path=").append(getCookiePath());
+		}
+
+		if (getCookieMaxAge() > 0) {
+			Calendar date = Calendar.getInstance();
+			date.add(Calendar.SECOND, getCookieMaxAge());
+			DateFormat df = new SimpleDateFormat("dd MMM yyyy kk:mm:ss z");
+			df.setTimeZone(TimeZone.getTimeZone("GMT"));
+			builder.append("; Expires=").append(df.format(date.getTime()));
+		}
+
+		if (secure) {
+			builder.append("; Secure");
+		}
+
+		builder.append("; HttpOnly");
+
+		return builder.toString();
+	}
+
 }
