@@ -80,58 +80,7 @@ public class Interpolator
          
          if ("#".equals(tok) && tokens.hasMoreTokens())
          {
-            String nextTok = tokens.nextToken();
-            
-            while (nextTok.equals("#") && tokens.hasMoreTokens())
-            {
-               builder.append(tok);
-               nextTok = tokens.nextToken();
-            }
-            
-            if ("{".equals(nextTok))
-            {
-               String expression = "#{" + tokens.nextToken() + "}";
-               try
-               {
-                  Object value = Expressions.instance().createValueExpression(expression).getValue();
-                  if (value != null)
-                     builder.append(value);
-               }
-               catch (Exception e)
-               {
-                  log.debug("exception interpolating string: " + string, e);
-               }
-               tokens.nextToken(); // the trailing "}"
-               
-            }
-            else if (nextTok.equals("#"))
-            {
-               // could be trailing #
-               builder.append("#");
-               
-            }
-            else
-            {
-               int index;
-               try
-               {
-                  index = Integer.parseInt(nextTok.substring(0, 1));
-                  if (index >= params.length)
-                  {
-                     // log.warn("parameter index out of bounds: " + index +
-                     // " in: " + string);
-                     builder.append("#").append(nextTok);
-                  }
-                  else
-                  {
-                     builder.append(params[index]).append(nextTok.substring(1));
-                  }
-               }
-               catch (NumberFormatException nfe)
-               {
-                  builder.append("#").append(nextTok);
-               }
-            }
+        	 processIfTokenIsHashtag(builder, tokens, tok, string, params);
          }
          else if ("{".equals(tok))
          {
@@ -145,7 +94,10 @@ public class Interpolator
                String nextTok = tokens.nextToken();
                expr.append(nextTok);
                
-               if (nextTok.equals("{"))
+               if(nextTok.equals("#")){
+            	   processIfTokenIsHashtag(builder, tokens, tok, string, params);
+               }
+               else if (nextTok.equals("{"))
                {
                   ++level;
                }
@@ -174,6 +126,10 @@ public class Interpolator
                      break;
                   }
                }
+               else
+               {
+            	   break;
+               }
             }
             
             if (expr != null)
@@ -189,5 +145,49 @@ public class Interpolator
       
       return builder.toString();
    }
+   
+   private void processIfTokenIsHashtag(StringBuilder builder, StringTokenizer tokens, String currentTok, String originalString, Object... params){
+		String nextTok = tokens.nextToken();
+
+		while (nextTok.equals("#") && tokens.hasMoreTokens()) {
+			builder.append(currentTok);
+			nextTok = tokens.nextToken();
+		}
+
+		if ("{".equals(nextTok)) {
+			String expression = "#{" + tokens.nextToken() + "}";
+			try {
+				Object value = Expressions.instance()
+						.createValueExpression(expression).getValue();
+				if (value != null)
+					builder.append(value);
+			} catch (Exception e) {
+				log.debug("exception interpolating string: " + originalString,
+						e);
+			}
+			tokens.nextToken(); // the trailing "}"
+
+		} else if (nextTok.equals("#")) {
+			// could be trailing #
+			builder.append("#");
+
+		} else {
+			int index;
+			try {
+				index = Integer.parseInt(nextTok.substring(0, 1));
+				if (index >= params.length) {
+					// log.warn("parameter index out of bounds: " +
+					// index +
+					// " in: " + string);
+					builder.append("#").append(nextTok);
+				} else {
+					builder.append(params[index]).append(
+							nextTok.substring(1));
+				}
+			} catch (NumberFormatException nfe) {
+				builder.append("#").append(nextTok);
+			}
+		}
+	}
    
 }
