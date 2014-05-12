@@ -2119,7 +2119,7 @@ public class Component extends Model
                // Only one factory instance can access result scope
                // CONVERSATION / EVENT / PAGE anyway due to
                // the locking of the conversation.
-               synchronized (factoryMethod)
+               synchronized (getLockingObject(name, scopeResult, scopeFactory, factoryMethod.getComponent().interceptionEnabled, factoryMethod))
                {
                   return createInstanceFromFactory(name, scope, factoryMethod, factory);
                }
@@ -2134,6 +2134,78 @@ public class Component extends Model
              return null;
           }
       }
+   }
+   
+   private static Object getLockingObject(String name, ScopeType scopeResult, ScopeType scopeFactory, boolean factoryInterceptionEnabled, Init.FactoryMethod appFactoryMethod) {
+	  if (!factoryInterceptionEnabled) {
+		// If the factory is not using interceptors, only need to consider the target scope.
+	     if(scopeResult == ScopeType.SESSION)
+		 {
+	        return getSessionFactoryMethod(name);
+		 }
+		 else
+		 {
+		    return appFactoryMethod;
+		 }
+      }
+	  else
+	  {
+	     if (scopeResult == ScopeType.SESSION && scopeFactory == ScopeType.SESSION)
+		 {
+		 // If both of them are session scoped, lock at session level.
+	    	 return getSessionFactoryMethod(name);
+		 }
+		 else if (scopeResult != ScopeType.SESSION && scopeFactory != ScopeType.SESSION)
+		 {
+		 // If both of them are NOT session scoped, just lock at app level.
+			return appFactoryMethod;
+		 }
+		 else {
+		 // Only one of them is session scoped.
+		 if (scopeResult == ScopeType.APPLICATION || scopeFactory == ScopeType.APPLICATION || scopeResult == ScopeType.BUSINESS_PROCESS || scopeFactory == ScopeType.BUSINESS_PROCESS)
+		 {
+		 // If one of them is app scoped or bp scoped, need to lock at app level.
+		    return appFactoryMethod;
+		 }
+		 else
+		 {
+		    return getSessionFactoryMethod(name);
+		 }
+		 }
+	  }
+   }
+	
+   public static String SESSION_FACTORY_METHODS = "sessionFactoryMethods";
+   
+   private static Object getSessionFactoryMethod(String name) {
+      Object sessionFactoryMethod;
+	  Context sessionContext;
+	  Map<String, Object> factoryMethods;
+	  
+	  sessionContext = Contexts.getSessionContext();
+	  
+	  synchronized(SESSION_FACTORY_METHODS) {
+	     factoryMethods = (Map<String, Object>) sessionContext.get(SESSION_FACTORY_METHODS);
+	     
+	     if (factoryMethods == null)
+	     {
+	        factoryMethods = new HashMap<String, Object>();
+		    sessionContext.set(SESSION_FACTORY_METHODS, factoryMethods);
+	     }
+	  }
+	     
+	  synchronized(factoryMethods)
+	  {
+	     sessionFactoryMethod = factoryMethods.get(name);
+	     
+	     if (sessionFactoryMethod == null)
+	     {
+	        sessionFactoryMethod = new Object();  // A placeholder for the given factory method for the session.
+		    factoryMethods.put(name, sessionFactoryMethod);
+	     }
+	     
+	     return sessionFactoryMethod;
+	  }
    }
 
    private static Object createInstanceFromFactory(String name, ScopeType scope, Init.FactoryMethod factoryMethod, Object factory)
