@@ -38,7 +38,7 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
    @Override
    public CacheManager getDelegate()
    {
-      return cacheManager;
+      return getCacheManager();
    }
 
    @Override
@@ -52,7 +52,7 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
    @Override
    public void clear()
    {
-      String[] strings = cacheManager.getCacheNames();
+      String[] strings = getCacheManager().getCacheNames();
       for (String cacheName : strings)
       {
          Cache cache = getCacheRegion(cacheName);
@@ -81,7 +81,7 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
       {
          regionName = getDefaultRegion();
       }
-      Cache result = cacheManager.getCache(regionName);
+      Cache result = getCacheManager().getCache(regionName);
       if (result == null)
       {
           log.debug("Could not find configuration for region [" + regionName + "]; using defaults.");
@@ -103,31 +103,44 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
    public void create()
    {
       log.debug("Starting EhCacheProvider cache");
-      try
-      {
-         if (getConfiguration() != null)
-         {
-            cacheManager = new CacheManager(getConfigurationAsStream());
-         }
-         else
-         {
-            cacheManager = new CacheManager();
-         }
-      }
-      catch (net.sf.ehcache.CacheException e)
-      {
-         throw new IllegalStateException("Error starting EHCache Cache", e);
-      }
+      createCacheManager();
    }
 
-   @Destroy
+	private synchronized void createCacheManager() {
+		if (cacheManager == null) {
+			try
+		      {
+		         if (getConfiguration() != null)
+		         {
+		            cacheManager = new CacheManager(getConfigurationAsStream());
+		         }
+		         else
+		         {
+		            cacheManager = new CacheManager();
+		         }
+		      }
+		      catch (net.sf.ehcache.CacheException e)
+		      {
+		         throw new IllegalStateException("Error starting EHCache Cache", e);
+		      }
+		}
+	}
+
+   private CacheManager getCacheManager() {
+	   if (cacheManager == null) {
+		   createCacheManager();
+	   }
+		return cacheManager;
+	}
+
+@Destroy
    public void destroy()
    {
       log.debug("Stopping EhCacheProvider cache");
 
       try
       {
-         cacheManager.shutdown();
+    	  getCacheManager().shutdown();
          cacheManager = null;
       }
       catch (RuntimeException e)
