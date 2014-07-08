@@ -2175,21 +2175,22 @@ public class Component extends Model
 	  }
    }
 	
-   public static String SESSION_FACTORY_METHODS = "sessionFactoryMethods";
+   public static final String SESSION_FACTORY_METHODS = "sessionFactoryMethods";
    
-   private static Object getSessionFactoryMethod(String name) {
-      Object sessionFactoryMethod;
+   @SuppressWarnings("unchecked")
+private static Object getSessionFactoryMethod(String name) {
+	  Serializable sessionFactoryMethod;
 	  Context sessionContext;
-	  Map<String, Object> factoryMethods;
+	  Map<String, Serializable> factoryMethods;
 	  
 	  sessionContext = Contexts.getSessionContext();
 	  
 	  synchronized(SESSION_FACTORY_METHODS) {
-	     factoryMethods = (Map<String, Object>) sessionContext.get(SESSION_FACTORY_METHODS);
+	     factoryMethods = (Map<String, Serializable>) sessionContext.get(SESSION_FACTORY_METHODS);
 	     
 	     if (factoryMethods == null)
 	     {
-	        factoryMethods = new HashMap<String, Object>();
+	        factoryMethods = new HashMap<String, Serializable>();
 		    sessionContext.set(SESSION_FACTORY_METHODS, factoryMethods);
 	     }
 	  }
@@ -2200,7 +2201,7 @@ public class Component extends Model
 	     
 	     if (sessionFactoryMethod == null)
 	     {
-	        sessionFactoryMethod = new Object();  // A placeholder for the given factory method for the session.
+	        sessionFactoryMethod = "";  // A placeholder for the given factory method for the session.
 		    factoryMethods.put(name, sessionFactoryMethod);
 	     }
 	     
