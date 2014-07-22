@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -2201,7 +2202,7 @@ private static Object getSessionFactoryMethod(String name) {
 	     
 	     if (sessionFactoryMethod == null)
 	     {
-	        sessionFactoryMethod = "";  // A placeholder for the given factory method for the session.
+	        sessionFactoryMethod = new Date();  // A placeholder for the given factory method for the session.
 		    factoryMethods.put(name, sessionFactoryMethod);
 	     }
 	     
