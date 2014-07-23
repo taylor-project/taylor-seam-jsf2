@@ -1,0 +1,21 @@
+env: 
+  global: 
+  - secure: YZb6o2m0kGbXA/Mimt0sxtEEmkI7nKlxMbjfJYsVpgjyBTazGM1pI13n6rE07JoAYUWN7cVnu/jsKYrAgf50bPswlRsubsvfUjNGof/K46DZlCYL6ZNlQq0/CKcyp5wO2Eb0pf6E5nML8nVwTcjeQP9HDgP6/CniUECswhiDHI4=
+  - secure: ev/MzySV1USwZGyM5h2VbWqSkV6r4GzZPSRoPxpymjyr6Vdb/nN5gJF/3Z5OQoChMu2aepdOxT/hKHoEQdZp5e/VOVSDEU8RpoeUkGG8+xbib6I4VbnqxI4vdwIfyvhIKKmG0QtZDdy/FW2fCbtA2jxOeSN2dy/8JVsWGG0mRIo=
+language: java
+notifications:
+  email:
+    recipients: 
+      - michael.donovan@danteinc.com
+      - john.gilbert@danteinc.com
+      - charles.zhao@danteinc.com
+    on_success: always
+    on_failure: always
+before_script:
+  - echo "web.sourceforge.net ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2uifHZbNexw6cXbyg1JnzDitL5VhYs0E65Hk/tLAPmcmm5GuiGeUoI/B0eUSNFsbqzwgwrttjnzKMKiGLN5CWVmlN1IXGGAfLYsQwK6wAu7kYFzkqP4jcwc5Jr9UPRpJdYIK733tSEmzab4qc5Oq8izKQKIaxXNe7FgmL15HjSpatFt9w/ot/CHS78FUAr3j3RwekHCm/jhPeqhlMAgC+jUgNJbFt3DlhDaRMa0NYamVzmX8D47rtmBbEDU3ld6AezWBPUR5Lh7ODOwlfVI58NAf/aYNlmvl2TZiauBCTa7OPYSyXJnIPbQXg6YQlDknNCr0K769EjeIlAfY87Z4tw==" >> ~/.ssh/known_hosts
+script:
+  - cd jboss-seam-parent; if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then mvn clean install deploy --settings settings.xml -Pmvn3; else mvn clean test; fi
+branches:
+  only:
+    - master
+    - current-release

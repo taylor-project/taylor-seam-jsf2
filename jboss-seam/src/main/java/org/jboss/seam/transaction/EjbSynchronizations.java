@@ -112,6 +112,7 @@ public class EjbSynchronizations implements LocalEjbSynchronizations, SessionSyn
    }
    
    @Remove
+   @TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
    public void destroy() {}
    
 }

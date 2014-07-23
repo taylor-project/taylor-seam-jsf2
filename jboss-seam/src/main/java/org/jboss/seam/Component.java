@@ -39,6 +39,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -56,6 +57,8 @@ import javassist.util.proxy.MethodFilter;
 import javassist.util.proxy.MethodHandler;
 import javassist.util.proxy.ProxyObject;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.naming.NamingException;
 import javax.servlet.http.HttpSessionActivationListener;
 
@@ -92,10 +95,10 @@ import org.jboss.seam.contexts.Context;
 import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.core.Events;
 import org.jboss.seam.core.Expressions;
-import org.jboss.seam.core.Init;
-import org.jboss.seam.core.Mutable;
 import org.jboss.seam.core.Expressions.MethodExpression;
 import org.jboss.seam.core.Expressions.ValueExpression;
+import org.jboss.seam.core.Init;
+import org.jboss.seam.core.Mutable;
 import org.jboss.seam.databinding.DataBinder;
 import org.jboss.seam.databinding.DataSelector;
 import org.jboss.seam.ejb.SeamInterceptor;
@@ -106,12 +109,12 @@ import org.jboss.seam.intercept.Proxy;
 import org.jboss.seam.log.LogProvider;
 import org.jboss.seam.log.Logging;
 import org.jboss.seam.util.Conversions;
+import org.jboss.seam.util.Conversions.PropertyValue;
 import org.jboss.seam.util.Naming;
 import org.jboss.seam.util.ProxyFactory;
 import org.jboss.seam.util.Reflections;
 import org.jboss.seam.util.SortItem;
 import org.jboss.seam.util.Sorter;
-import org.jboss.seam.util.Conversions.PropertyValue;
 import org.jboss.seam.web.Parameters;
 
 /**
@@ -162,7 +165,7 @@ public class Component extends Model
    private Set<Method> lifecycleMethods = new HashSet<Method>();
    private Set<Method> conversationManagementMethods = new HashSet<Method>();
    
-   private List<BijectedAttribute<In>> inAttributes = new ArrayList<BijectedAttribute<In>>();
+   private List<BijectedAttribute> inAttributes = new ArrayList<BijectedAttribute>();
    private List<BijectedAttribute<Out>> outAttributes = new ArrayList<BijectedAttribute<Out>>();
    private List<BijectedAttribute> parameterSetters = new ArrayList<BijectedAttribute>();
    private List<BijectedAttribute> dataModelGetters = new ArrayList<BijectedAttribute>();
@@ -693,6 +696,14 @@ public class Component extends Model
          inAttributes.add( new BijectedMethod(name, method, in) );
       }
       
+      if ( method.isAnnotationPresent(Inject.class) ) 
+      {
+         Inject in = method.getAnnotation(Inject.class);
+    	 Named named = method.getAnnotation(Named.class);
+         String name = toName(named == null ? null : named.value(), method );
+         inAttributes.add( new BijectedMethod(name, method, in) );
+      }
+      
       if ( method.isAnnotationPresent(Out.class) )
       {
          Out out = method.getAnnotation(Out.class);
@@ -830,6 +841,14 @@ public class Component extends Model
       {
          In in = field.getAnnotation(In.class);
          String name = toName( in.value(), field );
+         inAttributes.add( new BijectedField(name, field, in) );
+      }
+      
+      if ( field.isAnnotationPresent(Inject.class) )
+      {
+    	 Inject in = field.getAnnotation(Inject.class);
+    	 Named named = field.getAnnotation(Named.class);
+         String name = toName(named == null ? null : named.value(), field );
          inAttributes.add( new BijectedField(name, field, in) );
       }
       
@@ -1335,7 +1354,7 @@ public class Component extends Model
       return outAttributes;
    }
 
-   public List<BijectedAttribute<In>> getInAttributes()
+   public List<BijectedAttribute> getInAttributes()
    {
       return inAttributes;
    }
@@ -1734,9 +1753,9 @@ public class Component extends Model
 
    private void injectAttributes(Object bean, boolean enforceRequired)
    {
-      for ( BijectedAttribute<In> att : getInAttributes() )
+      for ( BijectedAttribute att : getInAttributes() )
       {
-         att.set( bean, getValueToInject( att.getAnnotation(), att.getName(), bean, enforceRequired ) );
+         att.set( bean, getValueToInject( att, bean, enforceRequired ) );
       }
    }
 
@@ -2101,7 +2120,7 @@ public class Component extends Model
                // Only one factory instance can access result scope
                // CONVERSATION / EVENT / PAGE anyway due to
                // the locking of the conversation.
-               synchronized (factoryMethod)
+               synchronized (getLockingObject(name, scopeResult, scopeFactory, factoryMethod.getComponent().interceptionEnabled, factoryMethod))
                {
                   return createInstanceFromFactory(name, scope, factoryMethod, factory);
                }
@@ -2116,6 +2135,79 @@ public class Component extends Model
              return null;
           }
       }
+   }
+   
+   private static Object getLockingObject(String name, ScopeType scopeResult, ScopeType scopeFactory, boolean factoryInterceptionEnabled, Init.FactoryMethod appFactoryMethod) {
+	  if (!factoryInterceptionEnabled) {
+		// If the factory is not using interceptors, only need to consider the target scope.
+	     if(scopeResult == ScopeType.SESSION)
+		 {
+	        return getSessionFactoryMethod(name);
+		 }
+		 else
+		 {
+		    return appFactoryMethod;
+		 }
+      }
+	  else
+	  {
+	     if (scopeResult == ScopeType.SESSION && scopeFactory == ScopeType.SESSION)
+		 {
+		 // If both of them are session scoped, lock at session level.
+	    	 return getSessionFactoryMethod(name);
+		 }
+		 else if (scopeResult != ScopeType.SESSION && scopeFactory != ScopeType.SESSION)
+		 {
+		 // If both of them are NOT session scoped, just lock at app level.
+			return appFactoryMethod;
+		 }
+		 else {
+		 // Only one of them is session scoped.
+		 if (scopeResult == ScopeType.APPLICATION || scopeFactory == ScopeType.APPLICATION || scopeResult == ScopeType.BUSINESS_PROCESS || scopeFactory == ScopeType.BUSINESS_PROCESS)
+		 {
+		 // If one of them is app scoped or bp scoped, need to lock at app level.
+		    return appFactoryMethod;
+		 }
+		 else
+		 {
+		    return getSessionFactoryMethod(name);
+		 }
+		 }
+	  }
+   }
+	
+   public static final String SESSION_FACTORY_METHODS = "sessionFactoryMethods";
+   
+   @SuppressWarnings("unchecked")
+private static Object getSessionFactoryMethod(String name) {
+	  Serializable sessionFactoryMethod;
+	  Context sessionContext;
+	  Map<String, Serializable> factoryMethods;
+	  
+	  sessionContext = Contexts.getSessionContext();
+	  
+	  synchronized(SESSION_FACTORY_METHODS) {
+	     factoryMethods = (Map<String, Serializable>) sessionContext.get(SESSION_FACTORY_METHODS);
+	     
+	     if (factoryMethods == null)
+	     {
+	        factoryMethods = new HashMap<String, Serializable>();
+		    sessionContext.set(SESSION_FACTORY_METHODS, factoryMethods);
+	     }
+	  }
+	     
+	  synchronized(factoryMethods)
+	  {
+	     sessionFactoryMethod = factoryMethods.get(name);
+	     
+	     if (sessionFactoryMethod == null)
+	     {
+	        sessionFactoryMethod = new Date();  // A placeholder for the given factory method for the session.
+		    factoryMethods.put(name, sessionFactoryMethod);
+	     }
+	     
+	     return sessionFactoryMethod;
+	  }
    }
 
    private static Object createInstanceFromFactory(String name, ScopeType scope, Init.FactoryMethod factoryMethod, Object factory)
@@ -2334,8 +2426,9 @@ public class Component extends Model
       }
    }
 
-   private Object getValueToInject(In in, String name, Object bean, boolean enforceRequired)
+   private Object getValueToInject(BijectedAttribute in, Object bean, boolean enforceRequired)
    {
+	  String name = in.getName();
       Object result;
       if ( name.startsWith("#") )
       {
@@ -2858,7 +2951,10 @@ public class Component extends Model
    public interface BijectedAttribute<T extends Annotation>
    {
       public String getName();
-      public T getAnnotation();
+      public boolean required();
+	  public boolean create();
+	  public ScopeType scope();
+	  public T getAnnotation();
       public Class getType();
       public void set(Object bean, Object value);
       public Object get(Object bean);
@@ -2869,12 +2965,22 @@ public class Component extends Model
       private final String name;
       private final Method method;
       private final T annotation;
+
+      private boolean required = true;
+  	  private boolean create = false;
+  	  private ScopeType scope = ScopeType.UNSPECIFIED;
       
       private BijectedMethod(String name, Method method, T annotation)
       {
          this.name = name;
          this.method = method;
          this.annotation = annotation;
+         
+         if (annotation instanceof In) {
+        	 required = ((In)annotation).required();
+        	 create = ((In)annotation).create();
+        	 scope = ((In)annotation).scope();
+         }
       }
       public String getName()
       {
@@ -2900,6 +3006,18 @@ public class Component extends Model
       {
          return method.getParameterTypes()[0];
       }
+	  public boolean required() 
+	  {
+		  return required;
+	  }
+	  public boolean create() 
+	  {
+		  return create;
+	  }
+	  public ScopeType scope() 
+	  {
+		  return scope;
+	  }
       @Override
       public String toString()
       {
@@ -2950,7 +3068,20 @@ public class Component extends Model
          return getter.getType();
       }
 
-      public void set(Object bean, Object value)
+	  public boolean required() 
+	  {
+		  return getter.required();
+	  }
+	  public boolean create() 
+	  {
+		  return getter.create();
+	  }
+	  public ScopeType scope() 
+	  {
+		  return getter.scope();
+	  }
+
+	  public void set(Object bean, Object value)
       {
          if (setter == null)
          {
@@ -2966,12 +3097,22 @@ public class Component extends Model
       private final String name;
       private final Field field;
       private final T annotation;
+
+      private boolean required = true;
+  	  private boolean create = false;
+  	  private ScopeType scope = ScopeType.UNSPECIFIED;
       
       private BijectedField(String name, Field field, T annotation)
       {
          this.name = name;
          this.field = field;
          this.annotation = annotation;
+         
+         if (annotation instanceof In) {
+        	 required = ((In)annotation).required();
+        	 create = ((In)annotation).create();
+        	 scope = ((In)annotation).scope();
+         }
       }
       public String getName()
       {
@@ -2997,6 +3138,18 @@ public class Component extends Model
       {
          return getFieldValue(bean, field, name);
       }
+	  public boolean required() 
+	  {
+		  return required;
+	  }
+	  public boolean create() 
+	  {
+		  return create;
+	  }
+	  public ScopeType scope() 
+	  {
+		  return scope;
+	  }
       @Override
       public String toString()
       {

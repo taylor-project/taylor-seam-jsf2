@@ -65,7 +65,15 @@ public class AsynchronousInvocation extends Asynchronous
       }.run();
       
    }
+
+   public String getComponentName() {
+      return componentName;
+   }
    
+   public String getMethodName() {
+      return methodName;
+   }
+
    @Override
    public String toString()
    {

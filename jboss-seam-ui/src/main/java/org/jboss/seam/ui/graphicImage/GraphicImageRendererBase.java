@@ -53,6 +53,8 @@ public class GraphicImageRendererBase extends RendererBase
       
       String url = context.getExternalContext().getRequestContextPath()
                + GraphicImageResource.GRAPHIC_IMAGE_RESOURCE_PATH + "/" + key + extension;
+      url = context.getExternalContext().encodeResourceURL(url);
+
       writer.writeAttribute(HTML.SRC_ATTR, url, HTML.SRC_ATTR);
       HTML.renderHTMLAttributes(writer, component, HTML.IMG_PASSTHROUGH_ATTRIBUTES);
       writer.endElement(HTML.IMG_ELEM);

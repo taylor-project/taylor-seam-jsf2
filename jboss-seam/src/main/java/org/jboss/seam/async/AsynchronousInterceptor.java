@@ -32,7 +32,15 @@ public class AsynchronousInterceptor extends AbstractInterceptor
             (!isExecutingAsynchronousCall() || Contexts.getEventContext().isSet(REENTRANT));
       if (scheduleAsync)
       {
-         Dispatcher dispatcher = AbstractDispatcher.instance();
+         Dispatcher dispatcher = null;
+         
+         Asynchronous async = invocation.getMethod().getAnnotation(Asynchronous.class);
+         if (async.dispatcher().length() > 0) {
+             dispatcher = AbstractDispatcher.instance(async.dispatcher());
+         } else {
+             dispatcher = AbstractDispatcher.instance();
+         }
+         
          if (dispatcher==null)
          {
             throw new IllegalStateException("org.jboss.seam.async.dispatcher is not installed in components.xml");

@@ -116,8 +116,14 @@ public class RuleBase
       {
          ruleBase = RuleBaseFactory.newRuleBase();
       }
-      
-      ruleBase.addPackage( builder.getPackage() );
+      if(builder.getPackage() != null)
+      {
+    	 ruleBase.addPackage( builder.getPackage() );
+      }
+      else
+      {
+    	  log.warn("No ruleFiles found when compiling rule base");
+      }
    }
    
    @Unwrap

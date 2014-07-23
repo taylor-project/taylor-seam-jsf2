@@ -58,7 +58,7 @@ import org.jboss.seam.util.TypedBeanProperty;
 public class JpaIdentityStore implements IdentityStore, Serializable
 {  
 
-   private static final long serialVersionUID = -3627993296654916436L;
+   protected static final long serialVersionUID = -3627993296654916436L;
 
    public static final String AUTHENTICATED_USER = "org.jboss.seam.security.management.authenticatedUser";
    
@@ -68,28 +68,28 @@ public class JpaIdentityStore implements IdentityStore, Serializable
    
    public static final String EVENT_PRE_PERSIST_USER_ROLE = "org.jboss.seam.security.management.prePersistUserRole";
    
-   private static final LogProvider log = Logging.getLogProvider(JpaIdentityStore.class);    
+   protected static final LogProvider log = Logging.getLogProvider(JpaIdentityStore.class);    
    
    protected FeatureSet featureSet;
    
-   private ValueExpression<EntityManager> entityManager;  
+   protected ValueExpression<EntityManager> entityManager;  
    
-   private Class userClass;
-   private Class roleClass;   
-   private Class xrefClass;
-   private TypedBeanProperty xrefUserProperty;
-   private TypedBeanProperty xrefRoleProperty;
+   protected Class userClass;
+   protected Class roleClass;   
+   protected Class xrefClass;
+   protected TypedBeanProperty xrefUserProperty;
+   protected TypedBeanProperty xrefRoleProperty;
    
-   private AnnotatedBeanProperty<UserPrincipal> userPrincipalProperty;
-   private AnnotatedBeanProperty<UserPassword> userPasswordProperty;
-   private AnnotatedBeanProperty<PasswordSalt> passwordSaltProperty;
-   private AnnotatedBeanProperty<UserRoles> userRolesProperty;
-   private AnnotatedBeanProperty<UserEnabled> userEnabledProperty;
-   private AnnotatedBeanProperty<UserFirstName> userFirstNameProperty;
-   private AnnotatedBeanProperty<UserLastName> userLastNameProperty;   
-   private AnnotatedBeanProperty<RoleName> roleNameProperty;
-   private AnnotatedBeanProperty<RoleGroups> roleGroupsProperty;
-   private AnnotatedBeanProperty<RoleConditional> roleConditionalProperty;
+   protected AnnotatedBeanProperty<UserPrincipal> userPrincipalProperty;
+   protected AnnotatedBeanProperty<UserPassword> userPasswordProperty;
+   protected AnnotatedBeanProperty<PasswordSalt> passwordSaltProperty;
+   protected AnnotatedBeanProperty<UserRoles> userRolesProperty;
+   protected AnnotatedBeanProperty<UserEnabled> userEnabledProperty;
+   protected AnnotatedBeanProperty<UserFirstName> userFirstNameProperty;
+   protected AnnotatedBeanProperty<UserLastName> userLastNameProperty;   
+   protected AnnotatedBeanProperty<RoleName> roleNameProperty;
+   protected AnnotatedBeanProperty<RoleGroups> roleGroupsProperty;
+   protected AnnotatedBeanProperty<RoleConditional> roleConditionalProperty;
    
    public Set<Feature> getFeatures()
    {
@@ -129,7 +129,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       initProperties();   
    }
    
-   private void initProperties()
+   protected void initProperties()
    {
       userPrincipalProperty = new AnnotatedBeanProperty(userClass, UserPrincipal.class);
       userPasswordProperty = new AnnotatedBeanProperty(userClass, UserPassword.class);
@@ -726,7 +726,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       return new ArrayList<String>(roles);
    }
    
-   private void addRoleAndMemberships(String role, Set<String> roles)
+   protected void addRoleAndMemberships(String role, Set<String> roles)
    {
       if (roles.add(role))
       {      
@@ -948,7 +948,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       return members;
    }
    
-   private List<String> listUserMembers(String role)
+   protected List<String> listUserMembers(String role)
    {      
       Object roleEntity = lookupRole(role);
 
@@ -979,7 +979,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
      
    }
    
-   private List<String> listRoleMembers(String role)
+   protected List<String> listRoleMembers(String role)
    {                
       
       if (roleGroupsProperty.isSet())
@@ -1050,7 +1050,7 @@ public class JpaIdentityStore implements IdentityStore, Serializable
       this.roleClass = roleClass;
    }
    
-   private EntityManager lookupEntityManager()
+   protected EntityManager lookupEntityManager()
    {
       return entityManager.getValue();
    }
