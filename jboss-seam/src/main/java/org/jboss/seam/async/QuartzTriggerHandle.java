@@ -14,6 +14,7 @@ import org.quartz.Trigger;
  */
 public class QuartzTriggerHandle implements Serializable
 {
+   private static final long serialVersionUID = 1L;
    private final String triggerName;
    private final String schedulerName;
    
