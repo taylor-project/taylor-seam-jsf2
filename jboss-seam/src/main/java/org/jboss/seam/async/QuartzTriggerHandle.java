@@ -56,6 +56,12 @@ public class QuartzTriggerHandle implements Serializable
        }
        return scheduler;
    }
+
+   @Override
+   public String toString() {
+      return "triggerName=" + triggerName
+         + ", schedulerName=" + schedulerName;
+   }
    
 }
   
