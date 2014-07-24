@@ -9,7 +9,6 @@ import java.util.Date;
 
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.Seam;
 import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Install;
@@ -285,7 +284,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       {
          JobDataMap dataMap = context.getJobDetail().getJobDataMap();
          async = (Asynchronous)dataMap.get("async");
-         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName(), (String) dataMap.get("schdeulerName"));
+         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName(), (String) dataMap.get("schedulerName"));
          try
          {
             async.execute(handle);
@@ -317,5 +316,4 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
    {
       return (QuartzDispatcher) AbstractDispatcher.instance(name);
    }
-
 }
