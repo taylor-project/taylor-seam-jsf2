@@ -45,6 +45,7 @@ public class BijectionInterceptor extends AbstractInterceptor
       
       try
       {    
+         if (!Object.class.getMethod("hashCode").equals(invocation.getMethod())){
          lock.lock();
          try
          {
@@ -72,6 +73,7 @@ public class BijectionInterceptor extends AbstractInterceptor
          finally
          {
             lock.unlock();
+         }
          }
                            
          Object result = invocation.proceed();
