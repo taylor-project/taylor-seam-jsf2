@@ -45,33 +45,35 @@ public class BijectionInterceptor extends AbstractInterceptor
       
       try
       {    
-         lock.lock();
-         try
-         {
-            if (!injected)
-            {              
-               if (injecting)
-               {
-                  throw new CyclicDependencyException();
-               }
+         if (!Object.class.getMethod("hashCode").equals(invocation.getMethod())){
+            lock.lock();
+            try
+            {
+               if (!injected)
+               {              
+                  if (injecting)
+                  {
+                     throw new CyclicDependencyException();
+                  }
 
-               injecting = true;
-               try
-               {
-                  component.inject(invocation.getTarget(), enforceRequired);
+                  injecting = true;
+                  try
+                  {
+                     component.inject(invocation.getTarget(), enforceRequired);
+                  }
+                  finally
+                  {
+                     injecting = false;
+                  }
+                  injected = true;
                }
-               finally
-               {
-                  injecting = false;
-               }
-               injected = true;
-            }
             
-            clients++;
-         }
-         finally
-         {
-            lock.unlock();
+               clients++;
+            }
+            finally
+            {
+               lock.unlock();
+            }
          }
                            
          Object result = invocation.proceed();

@@ -9,7 +9,7 @@ import java.util.Date;
 
 import org.jboss.seam.Component;
 import org.jboss.seam.ScopeType;
-import org.jboss.seam.Seam;
+import org.jboss.seam.annotations.Create;
 import org.jboss.seam.annotations.Destroy;
 import org.jboss.seam.annotations.Install;
 import org.jboss.seam.annotations.Name;
@@ -36,7 +36,6 @@ import org.quartz.impl.StdSchedulerFactory;
  * @author Michael Yuan
  *
  */
-//@Startup
 @Scope(ScopeType.APPLICATION)
 @Name("org.jboss.seam.async.dispatcher")
 @Install(value=false, precedence=BUILT_IN)
@@ -58,7 +57,17 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       this.propertiesFileName = propertiesFileName;
    }
 
-@Observer("org.jboss.seam.postInitialization")
+   private Boolean start = true;
+
+   public Boolean getStart() {
+      return start;
+   }
+
+   public void setStart(Boolean start) {
+      this.start = start;
+   }
+
+   @Observer("org.jboss.seam.postInitialization")
    public void initScheduler() throws SchedulerException
    {
        StdSchedulerFactory schedulerFactory = new StdSchedulerFactory();
@@ -86,7 +95,16 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
        }
 
        scheduler = schedulerFactory.getScheduler();
-       scheduler.start();
+       if (start) {
+           scheduler.start();
+       }
+   }
+
+   @Observer("org.jboss.seam.startQuartzScheduler")
+   public void startScheduler() throws SchedulerException {
+       if (!start) {
+           scheduler.start();
+       }
    }
 
    public QuartzTriggerHandle scheduleAsynchronousEvent(String type, Object... parameters)
@@ -266,7 +284,7 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       {
          JobDataMap dataMap = context.getJobDetail().getJobDataMap();
          async = (Asynchronous)dataMap.get("async");
-         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName(), (String) dataMap.get("schdeulerName"));
+         QuartzTriggerHandle handle = new QuartzTriggerHandle(context.getTrigger().getName(), (String) dataMap.get("schedulerName"));
          try
          {
             async.execute(handle);
@@ -283,13 +301,19 @@ public class QuartzDispatcher extends AbstractDispatcher<QuartzTriggerHandle, Sc
       return scheduler;
    }
    
+   private String schedulerName;
+   
+   @Create
+   public void create(Component component) {
+	   schedulerName = component.getName();
+   }
+   
    public String getSchedulerName() {
-	   return Seam.getComponentName(getClass());
+	   return schedulerName;
    }
 
    public static QuartzDispatcher instance(String name)
    {
       return (QuartzDispatcher) AbstractDispatcher.instance(name);
    }
-
 }

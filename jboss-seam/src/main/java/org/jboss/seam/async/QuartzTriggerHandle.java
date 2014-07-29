@@ -14,6 +14,7 @@ import org.quartz.Trigger;
  */
 public class QuartzTriggerHandle implements Serializable
 {
+   private static final long serialVersionUID = 1L;
    private final String triggerName;
    private final String schedulerName;
    
@@ -54,6 +55,12 @@ public class QuartzTriggerHandle implements Serializable
            scheduler = QuartzDispatcher.instance(schedulerName).getScheduler();
        }
        return scheduler;
+   }
+
+   @Override
+   public String toString() {
+      return "triggerName=" + triggerName
+         + ", schedulerName=" + schedulerName;
    }
    
 }
