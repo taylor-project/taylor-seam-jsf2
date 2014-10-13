@@ -84,10 +84,14 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
       Cache result = getCacheManager().getCache(regionName);
       if (result == null)
       {
-          log.debug("Could not find configuration for region [" + regionName + "]; using defaults.");
-          cacheManager.addCache(regionName);
+    	  synchronized (cacheManager){
+    		  if (!cacheManager.cacheExists(regionName)) {
+		          log.debug("Could not find configuration for region [" + regionName + "]; using defaults.");
+		          cacheManager.addCache(regionName);
+		          log.debug("EHCache region created: " + regionName);
+    		  }
+    	  }
           result = cacheManager.getCache(regionName);
-          log.debug("EHCache region created: " + regionName); 
       }
       return result;
    }
@@ -112,11 +116,11 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
 		      {
 		         if (getConfiguration() != null)
 		         {
-		            cacheManager = new CacheManager(getConfigurationAsStream());
+		            cacheManager = CacheManager.create(getConfigurationAsStream());
 		         }
 		         else
 		         {
-		            cacheManager = new CacheManager();
+		            cacheManager = CacheManager.create();
 		         }
 		      }
 		      catch (net.sf.ehcache.CacheException e)
