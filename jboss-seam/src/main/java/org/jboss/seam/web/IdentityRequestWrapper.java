@@ -2,8 +2,11 @@ package org.jboss.seam.web;
 
 import java.security.Principal;
 
+import javax.faces.component.UIViewRoot;
+import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 
 import org.jboss.seam.Seam;
 import org.jboss.seam.security.Identity;
@@ -44,4 +47,21 @@ public class IdentityRequestWrapper extends HttpServletRequestWrapper {
    {
       return Identity.isSecurityEnabled() && identity != null;
    }
+   
+   @Override
+	public HttpSession getSession(boolean create) {
+		if (!create) {
+			return super.getSession(create);
+		} else {
+			// TODO log thread dump
+			FacesContext ctx = FacesContext.getCurrentInstance();
+			if (ctx != null) {
+				UIViewRoot view = ctx.getViewRoot();
+				if (view != null) {
+					return super.getSession(!view.isTransient());
+				}
+			}
+			return super.getSession(create);
+		}
+	}
 }

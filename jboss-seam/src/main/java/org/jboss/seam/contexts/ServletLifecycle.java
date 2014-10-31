@@ -74,6 +74,19 @@ public class ServletLifecycle
       Contexts.applicationContext.set(new ApplicationContext( new ServletApplicationMap(ctx) ) );
       Contexts.conversationContext.set(null); //in case endRequest() was never called
    }
+
+   
+   public static void beginStatelessRequest(HttpServletRequest request)
+   {      
+      log.debug( ">>> Begin stateless web request" );
+      Contexts.eventContext.set( new EventContext( new ServletRequestMap(request) ) );
+      
+      // no session created so use a basic context
+      Contexts.sessionContext.set( new BasicContext(ScopeType.SESSION) );
+      
+      Contexts.applicationContext.set(new ApplicationContext( new ServletApplicationMap(servletContext) ) );
+      Contexts.conversationContext.set(null); //in case endRequest() was never called
+   }
    
    public static void endRequest(HttpServletRequest request) 
    {
