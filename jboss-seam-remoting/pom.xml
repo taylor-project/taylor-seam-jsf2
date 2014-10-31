@@ -92,7 +92,12 @@
                     <artifactId>jboss-seam-jsf2</artifactId>
                     <type>ejb</type>
                 </dependency>
-		
+				<dependency>
+					<groupId>org.drools</groupId>
+					<artifactId>drools-core</artifactId>
+					<scope>test</scope>
+				</dependency>
+
 	</dependencies>
 
 </project>
