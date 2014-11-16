@@ -27,12 +27,10 @@ import org.jboss.seam.annotations.Scope;
 import org.jboss.seam.annotations.Startup;
 import org.jboss.seam.annotations.intercept.BypassInterceptors;
 import org.jboss.seam.contexts.Contexts;
-import org.jboss.seam.drools.SeamGlobalResolver;
 import org.jboss.seam.log.LogProvider;
 import org.jboss.seam.log.Logging;
 import org.jboss.seam.security.Identity;
 import org.jboss.seam.security.Role;
-import org.jboss.seam.security.management.JpaIdentityStore;
 
 /**
  * A permission resolver that uses a Drools rule base to perform permission checks
@@ -50,35 +48,15 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    
    private static final LogProvider log = Logging.getLogProvider(RuleBasedPermissionResolver.class);
    
-   private StatefulSession securityContext;
-   
-   private RuleBase securityRules;  
-   
    @Create
    public boolean create()
    {
-      initSecurityContext();
       return getSecurityContext() != null;
    }
    
    protected void initSecurityContext()
    {
-      if (getSecurityRules() == null)
-      {
-         setSecurityRules((RuleBase) Component.getInstance(RULES_COMPONENT_NAME, true));
-      }
-      
-      if (getSecurityRules() != null)
-      {
-         setSecurityContext(getSecurityRules().newStatefulSession(false));
-         getSecurityContext().setGlobalResolver(new SeamGlobalResolver(getSecurityContext().getGlobalResolver()));
-      }
-      
-      if (getSecurityContext() == null)
-      {
-         log.debug("no security rule base available - please install a RuleBase with the name '" +
-                  RULES_COMPONENT_NAME + "' if permission checks are required.");
-      }
+	// No longer need to do anything
    }
    
    /**
@@ -205,12 +183,7 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    @Observer(Identity.EVENT_LOGGED_OUT)
    public void unAuthenticate()
    {
-      if (getSecurityContext() != null)
-      {
-         getSecurityContext().dispose();      
-         setSecurityContext(null);
-      }
-      initSecurityContext();
+	// No longer need to do anything
    }
    
    /**
@@ -270,23 +243,23 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    
    public StatefulSession getSecurityContext()
    {
-      return securityContext;
+      return (StatefulSession) Component.getInstance("securityContext");
    }
    
    public void setSecurityContext(StatefulSession securityContext)
    {
-      this.securityContext = securityContext;
+	// No longer need to do anything
    }
    
 
    public RuleBase getSecurityRules()
    {
-      return securityRules;
+      return (RuleBase) Component.getInstance("securityRuleBase");
    }
 
    public void setSecurityRules(RuleBase securityRules)
    {
-      this.securityRules = securityRules;
+	   RuleBaseFactory.instance().setSecurityRuleBase(securityRules);
    }       
    
    public static RuleBasedPermissionResolver instance()
@@ -313,17 +286,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
    @Observer(Identity.EVENT_POST_AUTHENTICATE)
    public void setUserAccountInSecurityContext()
    {
-      if (getSecurityContext() != null)
-      {         
-         getSecurityContext().insert(Identity.instance().getPrincipal());
-
-         // If we were authenticated with the JpaIdentityStore, then insert the authenticated
-         // UserAccount into the security context.         
-         if (Contexts.isEventContextActive() && Contexts.isSessionContextActive() &&
-               Contexts.getEventContext().isSet(JpaIdentityStore.AUTHENTICATED_USER))
-         {
-            getSecurityContext().insert(Contexts.getEventContext().get(JpaIdentityStore.AUTHENTICATED_USER));
-         }
-      }
+		// No longer need to do anything
    }
 }

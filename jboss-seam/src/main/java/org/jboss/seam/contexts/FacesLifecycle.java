@@ -52,7 +52,13 @@ public class FacesLifecycle
       log.debug( ">>> Begin JSF request for " + getRequestPath(externalContext) );
       Contexts.eventContext.set( new EventContext( externalContext.getRequestMap() ) );
       Contexts.applicationContext.set( new ApplicationContext( externalContext.getApplicationMap() ) );
-      Contexts.sessionContext.set( new SessionContext( externalContext.getSessionMap() ) );
+      
+      if (FacesContext.getCurrentInstance() != null && FacesContext.getCurrentInstance().getViewRoot() != null && FacesContext.getCurrentInstance().getViewRoot().isTransient()) { // TODO test is session already exists
+          Contexts.sessionContext.set( new BasicContext(ScopeType.SESSION) );
+      } else {
+          Contexts.sessionContext.set( new SessionContext( externalContext.getSessionMap() ) );
+      }
+      
       Session session = Session.getInstance();
       if ( session!=null && session.isInvalidDueToNewScheme( Pages.instance().getRequestScheme( FacesContext.getCurrentInstance() ) ) )
       {
@@ -62,8 +68,7 @@ public class FacesLifecycle
       //Events.instance(); //TODO: only for now, until we have a way to do EL outside of JSF!
       
       saveRequestPath(externalContext);
-   }
-   
+   }   
    
    /**
     * with rewriting, the filter chain might not have access to the post-rewrite request information.

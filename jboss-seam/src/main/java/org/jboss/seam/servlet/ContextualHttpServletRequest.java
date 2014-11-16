@@ -5,6 +5,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.contexts.ServletLifecycle;
@@ -28,12 +29,21 @@ public abstract class ContextualHttpServletRequest
    private final HttpServletRequest request;
    
    private static ThreadLocal<AtomicInteger> count = new ThreadLocal<AtomicInteger>();
+   
+   private boolean forceSessionCreation = true;
      
    public ContextualHttpServletRequest(HttpServletRequest request)
    {
       this.request = request;      
    }
    
+   public ContextualHttpServletRequest(HttpServletRequest request,
+		boolean forceSessionCreation) 
+   {
+      this.request = request;
+      this.forceSessionCreation = forceSessionCreation;
+   }
+
    public abstract void process() throws Exception;
    
    public void run() throws ServletException, IOException
@@ -41,16 +51,18 @@ public abstract class ContextualHttpServletRequest
       log.debug("beginning request"); 
            
       // Force creation of the session
-      if (request.getSession(false) == null)
-      {
-         request.getSession(true);
-      }
+      HttpSession session = request.getSession(forceSessionCreation);
       
       // Begin request and Seam life cycle only if it is not nested
       // ContextualHttpServletRequest
       if (getCounterValue() == 0)
       {         
-         ServletLifecycle.beginRequest(request);
+    	 if (session != null) {
+             ServletLifecycle.beginRequest(request);
+    	 } else {
+             ServletLifecycle.beginStatelessRequest(request);
+    	 }
+    	 
          ServletContexts.instance().setRequest(request);         
          restoreConversationId();
          Manager.instance().restoreConversation();
