@@ -148,6 +148,14 @@ public abstract class CacheProvider<T>
     */
    public abstract void clear();
 
+   /**
+    * Removes all objects from all partitioned cache regions
+    */
+   public void clear(String partition){
+     if(partition == null)
+       clear();
+   }
+
    public String getDefaultRegion()
    {
       return defaultRegion;

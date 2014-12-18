@@ -1,7 +1,7 @@
 package org.jboss.seam.cache;
 
-import static org.jboss.seam.annotations.Install.BUILT_IN;
 import static org.jboss.seam.ScopeType.APPLICATION;
+import static org.jboss.seam.annotations.Install.BUILT_IN;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Element;
@@ -57,6 +57,19 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
       {
          Cache cache = getCacheRegion(cacheName);
          cache.removeAll();
+      }
+   }
+
+   @Override
+   public void clear(String partition)
+   {
+      String[] strings = getCacheManager().getCacheNames();
+      for (String cacheName : strings)
+      {
+        if(cacheName.contains(partition + ":")){
+            Cache cache = getCacheRegion(cacheName);
+            cache.removeAll();
+        }
       }
    }
 
