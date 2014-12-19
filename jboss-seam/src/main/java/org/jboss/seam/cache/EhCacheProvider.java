@@ -66,13 +66,10 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
       String[] strings = getCacheManager().getCacheNames();
       for (String cacheName : strings)
       {
-        if(cacheName.contains(":")){
-        	String [] regionPair = cacheName.split(":");
-        	if(partition.equals(regionPair[0])){
-        		Cache cache = getCacheRegion(cacheName);
-                cache.removeAll();
-        	}    
-        }
+    	  if(cacheName.startsWith(partition + ":")){
+    		  Cache cache = getCacheRegion(cacheName);
+    		  cache.removeAll();
+    	  }
       }
    }
 
