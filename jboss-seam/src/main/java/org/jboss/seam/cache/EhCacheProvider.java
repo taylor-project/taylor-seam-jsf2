@@ -64,12 +64,13 @@ public class EhCacheProvider extends CacheProvider<CacheManager>
    public void clear(String partition)
    {
       String[] strings = getCacheManager().getCacheNames();
-      for (String cacheName : strings)
+      for (String cacheName : strings) 
       {
-    	  if(cacheName.startsWith(partition + ":")){
-    		  Cache cache = getCacheRegion(cacheName);
-    		  cache.removeAll();
-    	  }
+	  if (cacheName.startsWith(partition + ":")) 
+	  {
+	      Cache cache = getCacheRegion(cacheName);
+	      cache.removeAll();
+	  }
       }
    }
 
