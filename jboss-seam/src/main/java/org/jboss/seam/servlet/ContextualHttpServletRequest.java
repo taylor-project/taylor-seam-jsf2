@@ -7,13 +7,16 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
+import org.jboss.seam.contexts.Contexts;
 import org.jboss.seam.contexts.Lifecycle;
 import org.jboss.seam.contexts.ServletLifecycle;
 import org.jboss.seam.core.ConversationPropagation;
 import org.jboss.seam.core.Manager;
 import org.jboss.seam.log.LogProvider;
 import org.jboss.seam.log.Logging;
+import org.jboss.seam.security.Identity;
 import org.jboss.seam.web.ServletContexts;
+import org.jboss.seam.web.Session;
 
 /**
  * Perform work in a full set of Seam contexts
@@ -74,7 +77,17 @@ public abstract class ContextualHttpServletRequest
       {
          incrementCounterValue();
          
-         process();                 
+         try{
+        	 process();
+         } finally {
+        	 if (!forceSessionCreation) {
+        		 HttpSession s = request.getSession(false);
+     			 if (s != null && s.isNew() && Contexts.isSessionContextActive() && !Identity.instance().isLoggedIn()) {
+     				log.debug("Invalidating session: " + s.getId());
+     				Session.instance().invalidate();
+     			 }
+        	 }
+         }
 
          decrementCounterValue();
          
