@@ -153,10 +153,7 @@ public abstract class CacheProvider<T>
     */
    public void clear(String partition)
    {
-       if (partition == null)
-       {
-	   clear();
-       }
+      clear();
    }
 
    public String getDefaultRegion()
