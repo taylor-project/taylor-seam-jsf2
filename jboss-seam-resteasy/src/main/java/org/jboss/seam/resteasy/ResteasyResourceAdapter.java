@@ -117,13 +117,11 @@ public class ResteasyResourceAdapter extends AbstractResource
          SeamResteasyProviderFactory.pushContext(SecurityContext.class, new ServletSecurityContext(request));
 
          // Wrap in Seam contexts
-         new ContextualHttpServletRequest(request)
+         new ContextualHttpServletRequest(request, !application.isDestroySessionAfterRequest())
          {
             @Override
             public void process() throws ServletException, IOException
             {
-               try
-               {
                   HttpHeaders headers = ServletUtil.extractHttpHeaders(request);
                   UriInfoImpl uriInfo = extractUriInfo(request, application.getResourcePathPrefix());
 
@@ -143,21 +141,6 @@ public class ResteasyResourceAdapter extends AbstractResource
                   );
 
                   dispatcher.invoke(in, theResponse);
-               }
-               finally
-               {
-                  /*
-                   * Prevent anemic sessions clog up the server
-                   * 
-                   * session.isNew() check - do not close non-anemic sessions established by the view layer (JSF)
-                   * which are reused by the JAX-RS requests (so that the requests do not have to be re-authorized)
-                   */
-                  if (application.isDestroySessionAfterRequest() && request.getSession().isNew())
-                  {
-                     log.debug("Destroying HttpSession after REST request");
-                     Session.instance().invalidate();
-                  }
-               }
             }
          }.run();
 
