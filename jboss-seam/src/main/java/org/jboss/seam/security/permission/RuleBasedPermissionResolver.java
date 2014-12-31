@@ -104,7 +104,6 @@ public class RuleBasedPermissionResolver implements PermissionResolver, Serializ
             {
                securityContext.retract(handle);
             }
-            securityContext.dispose();
          }
       }
       
