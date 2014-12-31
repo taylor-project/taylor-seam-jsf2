@@ -53,7 +53,12 @@ public class FacesLifecycle
       Contexts.eventContext.set( new EventContext( externalContext.getRequestMap() ) );
       Contexts.applicationContext.set( new ApplicationContext( externalContext.getApplicationMap() ) );
       
-      if (FacesContext.getCurrentInstance() != null && FacesContext.getCurrentInstance().getViewRoot() != null && FacesContext.getCurrentInstance().getViewRoot().isTransient()) { // TODO test is session already exists
+      FacesContext ctx = FacesContext.getCurrentInstance(); 
+      if (ctx != null
+         && ctx.getViewRoot() != null
+         && ctx.getViewRoot().isTransient()
+         && externalContext.getSession(false) == null)
+      {
           Contexts.sessionContext.set( new BasicContext(ScopeType.SESSION) );
       } else {
           Contexts.sessionContext.set( new SessionContext( externalContext.getSessionMap() ) );
@@ -131,7 +136,7 @@ public class FacesLifecycle
          Session session = Session.getInstance();
          boolean sessionInvalid = session!=null && session.isInvalid();
          
-         Contexts.flushAndDestroyContexts();
+         Contexts.flushAndDestroyContexts(Contexts.getSessionContext() instanceof BasicContext);
 
          if (sessionInvalid)
          {

@@ -111,6 +111,31 @@ public class ServletLifecycle
          log.debug( "<<< End web request" );
       }
    }
+   
+   public static void endStatelessRequest(HttpServletRequest request) 
+   {
+	      log.debug("After request, destroying contexts");
+	      try
+	      {
+	         Session session = Session.getInstance();
+	         boolean sessionInvalid = session!=null && session.isInvalid();
+	         
+	         Contexts.flushAndDestroyContexts(true);
+	         
+	         if (sessionInvalid)
+	         {
+	            Lifecycle.clearThreadlocals();
+	            request.getSession().invalidate();
+	            //actual session context will be destroyed from the listener
+	         }
+	      }
+	      finally
+	      {
+	         Lifecycle.clearThreadlocals();
+	         log.debug( "<<< End web request" );
+	      }
+   }   
+   
    @Deprecated
    public static void beginReinitialization(HttpServletRequest request)
    {
