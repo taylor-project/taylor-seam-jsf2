@@ -96,7 +96,11 @@ public abstract class ContextualHttpServletRequest
          {
             //TODO: conversation timeout
             Manager.instance().endRequest( new ServletRequestSessionMap(request)  );
-            ServletLifecycle.endRequest(request);
+            if (session != null) {
+               ServletLifecycle.endRequest(request);
+            } else {
+               ServletLifecycle.endStatelessRequest(request);
+            }
          }
       }
       catch (IOException ioe)
