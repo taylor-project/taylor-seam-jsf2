@@ -356,11 +356,7 @@ public class Contexts
     * At the end of a request, flush all contexts to their underlying
     * persistent stores, or destroy their attributes (one or the other!).
     */
-   static void flushAndDestroyContexts() {
-	   flushAndDestroyContexts(false);
-   }
-   
-   static void flushAndDestroyContexts(boolean destroySession)
+   static void flushAndDestroyContexts()
    {
    
       if ( isConversationContextActive() )
@@ -424,13 +420,8 @@ public class Contexts
       
       if ( isSessionContextActive() )
       {
-    	 if (destroySession) {
-             log.debug("destroying session context");
-             destroy( getSessionContext() );
-    	 } else {
-             log.debug("flushing session context");
-             getSessionContext().flush();
-    	 }
+         log.debug("flushing session context");
+         getSessionContext().flush();
       }
       
       //destroy the event context after the
