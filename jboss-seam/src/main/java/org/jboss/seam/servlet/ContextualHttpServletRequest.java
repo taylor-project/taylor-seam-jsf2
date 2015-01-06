@@ -54,17 +54,15 @@ public abstract class ContextualHttpServletRequest
       log.debug("beginning request"); 
            
       // Force creation of the session
-      HttpSession session = request.getSession(forceSessionCreation);
+      if(request.getSession(false) == null){
+    	  request.getSession(true);
+      }
       
       // Begin request and Seam life cycle only if it is not nested
       // ContextualHttpServletRequest
       if (getCounterValue() == 0)
       {         
-    	 if (session != null) {
-             ServletLifecycle.beginRequest(request);
-    	 } else {
-             ServletLifecycle.beginStatelessRequest(request);
-    	 }
+         ServletLifecycle.beginRequest(request);
     	 
          ServletContexts.instance().setRequest(request);         
          restoreConversationId();
@@ -77,17 +75,7 @@ public abstract class ContextualHttpServletRequest
       {
          incrementCounterValue();
          
-         try{
-        	 process();
-         } finally {
-        	 if (!forceSessionCreation) {
-        		 HttpSession s = request.getSession(false);
-     			 if (s != null && s.isNew() && Contexts.isSessionContextActive() && !Identity.instance().isLoggedIn()) {
-     				log.debug("Invalidating session: " + s.getId());
-     				Session.instance().invalidate();
-     			 }
-        	 }
-         }
+         process();
 
          decrementCounterValue();
          
