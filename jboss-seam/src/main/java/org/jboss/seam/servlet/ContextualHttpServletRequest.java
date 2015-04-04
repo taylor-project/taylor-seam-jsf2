@@ -53,10 +53,8 @@ public abstract class ContextualHttpServletRequest
    {      
       log.debug("beginning request"); 
            
-      // Force creation of the session
-      if(request.getSession(false) == null){
-    	  request.getSession(true);
-      }
+      // Force creation of the session if desired
+      HttpSession session = request.getSession(forceSessionCreation);
       
       // Begin request and Seam life cycle only if it is not nested
       // ContextualHttpServletRequest
@@ -75,7 +73,7 @@ public abstract class ContextualHttpServletRequest
       {
          incrementCounterValue();
          
-         try{
+         try {
         	 process();
          } finally {
         	 if (!forceSessionCreation) {
