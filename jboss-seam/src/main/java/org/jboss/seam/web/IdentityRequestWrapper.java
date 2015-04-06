@@ -4,6 +4,7 @@ import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 
 import org.jboss.seam.Seam;
 import org.jboss.seam.security.Identity;
@@ -20,8 +21,10 @@ public class IdentityRequestWrapper extends HttpServletRequestWrapper {
 
    public IdentityRequestWrapper(HttpServletRequest request) {
       super(request);
-      identity = (Identity) request.getSession().
-         getAttribute(Seam.getComponentName(Identity.class));
+      HttpSession session = request.getSession(false);
+      if (session != null) {
+         identity = (Identity) session.getAttribute(Seam.getComponentName(Identity.class));
+      }
    }
 
    @Override
