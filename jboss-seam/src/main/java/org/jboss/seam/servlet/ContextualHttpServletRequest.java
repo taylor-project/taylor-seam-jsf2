@@ -78,7 +78,9 @@ public abstract class ContextualHttpServletRequest
          } finally {
         	 if (!forceSessionCreation) {
         		 HttpSession s = request.getSession(false);
-     			 if (s != null && s.isNew() && Contexts.isSessionContextActive() && !Identity.instance().isLoggedIn()) {
+        		 if (s != null && s.isNew()
+                    && Contexts.isSessionContextActive()
+        		    && !Identity.instance().isLoggedIn()) {
      				log.debug("Invalidating session: " + s.getId());
      				Session.instance().invalidate();
      			 }
