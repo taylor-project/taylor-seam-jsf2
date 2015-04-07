@@ -75,19 +75,7 @@ public abstract class ContextualHttpServletRequest
       {
          incrementCounterValue();
          
-         try {
-        	 process();
-         } finally {
-        	 if (!forceSessionCreation) {
-        		 HttpSession s = request.getSession(false);
-        		 if (s != null && s.isNew()
-                    && Contexts.isSessionContextActive()
-        		    && !Identity.instance().isLoggedIn()) {
-     				log.debug("Invalidating session: " + s.getId());
-     				Session.instance().invalidate();
-     			 }
-        	 }
-         }
+         process();
 
          decrementCounterValue();
          
