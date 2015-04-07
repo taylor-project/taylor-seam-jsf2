@@ -21,10 +21,7 @@ public class IdentityRequestWrapper extends HttpServletRequestWrapper {
 
    public IdentityRequestWrapper(HttpServletRequest request) {
       super(request);
-      HttpSession session = request.getSession(false);
-      if (session != null) {
-         identity = (Identity) session.getAttribute(Seam.getComponentName(Identity.class));
-      }
+      identity = (Identity) request.getSession().getAttribute(Seam.getComponentName(Identity.class));
    }
 
    @Override
