@@ -56,6 +56,8 @@
 		<jboss.releases.repo.url>https://repository.jboss.org/nexus/service/local/staging/deploy/maven2/</jboss.releases.repo.url>
 		<jboss.snapshots.repo.url>https://repository.jboss.org/nexus/content/repositories/snapshots/</jboss.snapshots.repo.url>
 		<maven.build.timestamp.format>yyyyMMdd-HHmm</maven.build.timestamp.format>
+
+		<wagon.ssh.version>1.0-beta-2</wagon.ssh.version>
 	</properties>
 
 	<dependencyManagement>
@@ -1593,11 +1595,24 @@
 
 	<repositories>
 		<repository>
-			<id>jboss</id>
-			<name>JBoss Repository</name>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
 			<url>https://repository.jboss.org/nexus/content/groups/public</url>
 		</repository>
 	</repositories>
+
+	<pluginRepositories>
+		<pluginRepository>
+			<id>atlassian</id>
+			<name>atlassian Artifactory Repository</name>
+			<url>https://maven.atlassian.com/content/groups/public</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>jboss-public-repository-group</id>
+			<name>JBoss Public Maven Repository Group</name>
+			<url>https://repository.jboss.org/nexus/content/groups/public/</url>
+		</pluginRepository>
+	</pluginRepositories>
 
 	<organization>
 		<name>Seam Framework</name>
@@ -1619,7 +1634,28 @@
 		</snapshotRepository>
 	</distributionManagement>
 
+
+	<profiles>
+		<profile>
+			<id>mvn3</id>
+			<!--profile used to switch settings that enable the build to run under mvn3-->
+			<activation>
+				<activeByDefault>false</activeByDefault>
+			</activation>
+			<properties>
+				<wagon.ssh.version>2.4</wagon.ssh.version>
+			</properties>
+		</profile>
+	</profiles>
+
 	<build>
+		<extensions>
+    		<extension>
+      			<groupId>org.apache.maven.wagon</groupId>
+       			<artifactId>wagon-ssh</artifactId>
+       			<version>${wagon.ssh.version}</version>
+    		</extension>
+  		</extensions>
 		<defaultGoal>package</defaultGoal>
         <finalName>${project.artifactId}</finalName>
 		<pluginManagement>
